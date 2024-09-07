@@ -1,0 +1,26 @@
+services:
+  server:
+    build: server/
+    tty: true
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    volumes:
+      - ./server:/src
+    ports:
+      - '8080:8080'
+    networks:
+      - todolist
+  
+  app:
+    build: react/
+    tty: true
+    volumes:
+      - ./react:/src
+    ports:
+      - '5173:5173'
+    networks:
+      - todolist
+
+networks:
+  todolist:
+    external: true

@@ -1,6 +1,26 @@
 services:
+  db:
+    image: mysql:8.4.2
+    ports:
+      - '3306:3306'
+    tty: true #必要かわかんない
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ROOT_PASSWORD}
+      - MYSQL_DATABASE=${DB_NAME}
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASS}
+      - TZ=${TZ}
+    volumes:
+      - ./mysql/conf:/etc/mysql/conf.d/:ro
+      - mysqldata2:/var/lib/mysql
+      - ./mysql/logs:/var/log/mysql
+    networks:
+      - todolist
+
   server:
-    build: server/
+    build:
+      context: ./server
+      dockerfile: Dockerfile
     tty: true
     environment:
       - CHOKIDAR_USEPOLLING=true
@@ -8,6 +28,9 @@ services:
       - ./server:/src
     ports:
       - '8080:8080'
+      - '5555:5555'
+    depends_on:
+      - db
     networks:
       - todolist
   
@@ -18,9 +41,14 @@ services:
       - ./react:/src
     ports:
       - '5173:5173'
+    depends_on:
+      - server
     networks:
       - todolist
 
 networks:
   todolist:
     external: true
+
+volumes:
+  mysqldata2:

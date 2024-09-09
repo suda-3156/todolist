@@ -3,6 +3,7 @@ import { verifyToken } from "../midleware/auth-checkers/token";
 import { prisma } from "../../index"
 import { upsertItem, deleteItem } from "../controllers/todo-controllers";
 import { isTodoItem } from "../midleware/validators/todo";
+import { ProblemDetails, TodoListResponse } from "../type";
 
 const router = Router()
 
@@ -18,35 +19,33 @@ router.post("/all", verifyToken, async (req: Request, res: Response) => {
             title: true,
             completed: true,
             deleted: true,
+            authorId: true
           }
         }
       }
     })
     if (!data) {
-      return res.status(404).json({
-        responseCd: "1",
-        data: {
-          errors: [
-            "Not Found"
-          ]
-        }
-      })
+      const response :ProblemDetails = {
+        title: "DATABASE_ERROR",
+        detail: "Cannot access to the database.",
+        type: "SYSTEM_ERROR",
+        status: 500,
+      }
+      return res.status(500).json(response)
     }
-    return res.status(200).json({
-      responseCd: "0",
-      data: {
-        todos: data?.todos
-      }
-    })
+    const response :TodoListResponse = {
+      title: "SUCCESS",
+      todolist: data.todos
+    }
+    return res.status(200).json(response)
   } catch (error) {
-    return res.status(500).json({
-      responseCd: "-1",
-      data: {
-        errors: [
-          "SYSTEM_ERROR"
-        ]
-      }
-    })
+    const response :ProblemDetails = {
+      title: "DATABASE_ERROR",
+      detail: "Cannot access to the database.",
+      type: "SYSTEM_ERROR",
+      status: 500,
+    }
+    return res.status(500).json(response)
   }
 })
 

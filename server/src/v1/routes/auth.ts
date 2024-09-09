@@ -3,6 +3,7 @@ import * as userController from "../controllers/user-controllers"
 import * as tokenHandler from "../midleware/auth-checkers/token"
 import CryptoJS from "crypto-js"
 import { isUserRegister, isUserLogin } from "../midleware/validators/user";
+import { UserResponse } from "../type";
 
 const router = Router()
 
@@ -26,16 +27,15 @@ router.post("/verify",
   tokenHandler.verifyToken,
   (req: Request, res: Response) => {
     const resEmail = CryptoJS.AES.decrypt(req.body.user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-    return res.status(201).json({
-      responseCd: "0",
-      data: {
-        user: {
-          name: req.body.user.name,
-          email: resEmail,
-          role: req.body.user.role
-        }
+    const response :UserResponse = {
+      title: "SUCCESS",
+      user: {
+        name: req.body.user.name,
+        email: resEmail,
+        role: req.body.user.role
       }
-    })
+    }
+    return res.status(201).json(response)
   }
 )
 

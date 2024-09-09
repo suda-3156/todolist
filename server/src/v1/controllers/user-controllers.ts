@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import JWT from "jsonwebtoken"
 import CryptoJS from "crypto-js";
 import { prisma } from "../../index";
+import { ProblemDetails, UserTokenResponse } from "../type";
 
 
 export const Register = async (req :Request, res: Response) => {
@@ -23,26 +24,26 @@ export const Register = async (req :Request, res: Response) => {
       expiresIn: "1h"
     })
     const resEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-    return res.status(201).json({
-      responseCd: "0",
-      data: {
-        user: {
-          name: user.name,
-          email: resEmail,
-          role: user.role
-        },
-        token: {
-          accessToken: accessToken
-        }
+    const response :UserTokenResponse = {
+      title: "SUCCESS",
+      user: {
+        name: user.name,
+        email: resEmail,
+        role: user.role
+      },
+      token: {
+        accessToken: accessToken
       }
-    })
+    }
+    return res.status(201).json(response)
   } catch (error) {
-    res.status(500).json({
-      responseCd: "-1",
-      data: {
-        errors: ["SYSTEM_ERROR"]
-      }
-    })
+    const response :ProblemDetails = {
+      title: "CANNOT_CREATE_ACCOUNT",
+      detail: "Cannot create an account.",
+      type: "SYSTEM_ERROR",
+      status: 500,
+    }
+    return res.status(500).json(response)
   }
 }
 
@@ -53,12 +54,13 @@ export const Login = async (req :Request, res :Response) => {
       where: { name: name }
     })
     if( !user ) {
-      return res.status(401).json({
-        responseCd: "1",
-        data: {
-          errors: ["INVALID_USERNAME_OR_PASSWORD"]
-        }
-      })
+      const response :ProblemDetails = {
+        title: "INVALID_NAME_OR_PASSWORD",
+        detail: "Cannot find the user.",
+        type: "UNAUTHORIZED",
+        status: 401,
+      }
+      return res.status(401).json(response)
     }
 
     const decryptedPassword = CryptoJS.AES.decrypt(
@@ -67,12 +69,13 @@ export const Login = async (req :Request, res :Response) => {
     ).toString(CryptoJS.enc.Utf8)
 
     if (decryptedPassword !== password) {
-      return res.status(401).json({
-        responseCd: "1",
-        data: {
-          errors: ["INVALID_USERNAME_OR_PASSWORD"]
-        }
-      })
+      const response :ProblemDetails = {
+        title: "INVALID_NAME_OR_PASSWORD",
+        detail: "Password dosen't match.",
+        type: "UNAUTHORIZED",
+        status: 401,
+      }
+      return res.status(401).json(response)
     }
 
     const resEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
@@ -80,23 +83,25 @@ export const Login = async (req :Request, res :Response) => {
       expiresIn: "1h"    
     })
 
-    return res.status(201).json({
-      responseCd: "0",
-      data: {
-        user: {
-          name: user.name,
-          email: resEmail,
-          role: user.role
-        },
-        token: {
-          accessToken: accessToken
-        }
+    const response :UserTokenResponse = {
+      title: "SUCCESS",
+      user: {
+        name: user.name,
+        email: resEmail,
+        role: user.role
+      },
+      token: {
+        accessToken: accessToken
       }
-    })
+    }
+    return res.status(201).json(response)
   } catch (error) {
-    return res.status(500).json({
-      responseCd: "-1",
-      message: "SYSTEM_ERROR"
-    })
+    const response :ProblemDetails = {
+      title: "DATABASE_ERROR",
+      detail: "Cannot access to the database.",
+      type: "SYSTEM_ERROR",
+      status: 500,
+    }
+    return res.status(500).json(response)
   }
 }

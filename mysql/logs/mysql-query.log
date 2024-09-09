@@ -13450,3 +13450,161 @@ ALTER TABLE `Todo` ADD CONSTRAINT `Todo_authorId_fkey` FOREIGN KEY (`authorId`) 
 2024-09-09T00:24:59.299940+09:00	  237 Query	SELECT * FROM `_prisma_migrations` LIMIT 0
 2024-09-09T00:25:03.067455+09:00	  237 Query	show tables
 2024-09-09T00:25:06.215480+09:00	  237 Quit	
+/usr/sbin/mysqld, Version: 8.4.2 (MySQL Community Server - GPL). started with:
+Tcp port: 3306  Unix socket: /var/run/mysqld/mysqld.sock
+Time                 Id Command    Argument
+2024-09-09T18:18:43.905478+09:00	    0 Execute	CREATE TABLE performance_schema.innodb_redo_log_files(
+`FILE_ID` BIGINT NOT NULL COMMENT 'Id of the file.',
+`FILE_NAME` VARCHAR(2000) NOT NULL COMMENT 'Path to the file.',
+`START_LSN` BIGINT NOT NULL COMMENT 'LSN of the first block in the file.',
+`END_LSN` BIGINT NOT NULL COMMENT 'LSN after the last block in the file.',
+`SIZE_IN_BYTES` BIGINT NOT NULL COMMENT 'Size of the file (in bytes).',
+`IS_FULL` TINYINT NOT NULL COMMENT '1 iff file has no free space inside.',
+`CONSUMER_LEVEL` INT NOT NULL COMMENT 'All redo log consumers registered on smaller levels than this value, have already consumed this file.'
+)engine = 'performance_schema'
+2024-09-09T22:46:42.882213+09:00	    8 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:46:42.902962+09:00	    8 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:46:42.912772+09:00	    9 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:46:42.913116+09:00	   10 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:46:42.913284+09:00	    9 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:46:42.913630+09:00	   10 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:46:42.920565+09:00	   10 Query	BEGIN
+2024-09-09T22:46:42.959072+09:00	    8 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE 1=1 ORDER BY `todolist`.`User`.`id` ASC LIMIT ? OFFSET ?
+2024-09-09T22:46:42.959287+09:00	   10 Prepare	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:46:42.959289+09:00	    9 Prepare	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:46:42.960682+09:00	    8 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE 1=1 ORDER BY `todolist`.`User`.`id` ASC LIMIT 100 OFFSET 0
+2024-09-09T22:46:42.960684+09:00	   10 Execute	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:46:42.960693+09:00	    9 Execute	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:46:42.964197+09:00	   10 Prepare	SELECT COUNT(*) FROM (SELECT `todolist`.`Todo`.`itemId` FROM `todolist`.`Todo` WHERE 1=1) AS `sub`
+2024-09-09T22:46:42.964323+09:00	   10 Execute	SELECT COUNT(*) FROM (SELECT `todolist`.`Todo`.`itemId` FROM `todolist`.`Todo` WHERE 1=1) AS `sub`
+2024-09-09T22:46:42.964608+09:00	   10 Query	COMMIT
+2024-09-09T22:46:49.939158+09:00	   11 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:46:49.940109+09:00	   11 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:46:49.940946+09:00	   11 Query	BEGIN
+2024-09-09T22:46:49.942018+09:00	   11 Prepare	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:46:49.942162+09:00	   11 Execute	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:46:49.942807+09:00	   11 Prepare	SELECT COUNT(*) FROM (SELECT `todolist`.`Todo`.`itemId` FROM `todolist`.`Todo` WHERE 1=1) AS `sub`
+2024-09-09T22:46:49.942943+09:00	   11 Execute	SELECT COUNT(*) FROM (SELECT `todolist`.`Todo`.`itemId` FROM `todolist`.`Todo` WHERE 1=1) AS `sub`
+2024-09-09T22:46:49.943251+09:00	   11 Query	COMMIT
+2024-09-09T22:46:50.266667+09:00	   12 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:46:50.267245+09:00	   12 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:46:50.268039+09:00	   12 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE 1=1 ORDER BY `todolist`.`User`.`id` ASC LIMIT ? OFFSET ?
+2024-09-09T22:46:50.268185+09:00	   12 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE 1=1 ORDER BY `todolist`.`User`.`id` ASC LIMIT 100 OFFSET 0
+2024-09-09T22:46:50.268750+09:00	   13 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:46:50.269174+09:00	   13 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:46:50.269755+09:00	   13 Prepare	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:46:50.269882+09:00	   13 Execute	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:54:14.357639+09:00	   14 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:54:14.359699+09:00	   14 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:54:14.415970+09:00	   14 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-09T22:54:14.417994+09:00	   14 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T22:54:14.426135+09:00	   14 Query	BEGIN
+2024-09-09T22:54:14.434431+09:00	   14 Prepare	INSERT INTO `todolist`.`User` (`id`,`email`,`name`,`password`,`role`,`createdAt`,`updatedAt`) VALUES (?,?,?,?,?,?,?)
+2024-09-09T22:54:14.434804+09:00	   14 Execute	INSERT INTO `todolist`.`User` (`id`,`email`,`name`,`password`,`role`,`createdAt`,`updatedAt`) VALUES ('f673263a-0f76-4a42-a723-cc3648118281','U2FsdGVkX1/AT2aF1beWoY95zOX9ZOyA0BdGIwP4CcZCMzFCaoXdN9iI4bIk1vNM','username2','U2FsdGVkX1+Te1icf60iAKFdwC7+rs+cEOpe001FE5I=','USER','2024-09-09 13:54:14.426000','2024-09-09 13:54:14.426000')
+2024-09-09T22:54:14.439282+09:00	   14 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE `todolist`.`User`.`id` = ? LIMIT ? OFFSET ?
+2024-09-09T22:54:14.439410+09:00	   14 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE `todolist`.`User`.`id` = 'f673263a-0f76-4a42-a723-cc3648118281' LIMIT 1 OFFSET 0
+2024-09-09T22:54:14.443503+09:00	   14 Query	COMMIT
+2024-09-09T22:54:26.002874+09:00	   15 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:54:26.003418+09:00	   15 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:54:26.004396+09:00	   15 Prepare	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:54:26.004545+09:00	   15 Execute	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T22:54:26.004958+09:00	   16 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:54:26.005590+09:00	   16 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:54:26.006302+09:00	   16 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE 1=1 ORDER BY `todolist`.`User`.`id` ASC LIMIT ? OFFSET ?
+2024-09-09T22:54:26.006473+09:00	   16 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE 1=1 ORDER BY `todolist`.`User`.`id` ASC LIMIT 100 OFFSET 0
+2024-09-09T22:54:26.008866+09:00	   16 Prepare	SELECT `todolist`.`Todo`.`itemId`, `todolist`.`Todo`.`authorId` FROM `todolist`.`Todo` WHERE `todolist`.`Todo`.`authorId` IN (?)
+2024-09-09T22:54:26.008985+09:00	   16 Execute	SELECT `todolist`.`Todo`.`itemId`, `todolist`.`Todo`.`authorId` FROM `todolist`.`Todo` WHERE `todolist`.`Todo`.`authorId` IN ('f673263a-0f76-4a42-a723-cc3648118281')
+2024-09-09T22:55:46.571540+09:00	   17 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:55:46.573252+09:00	   17 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:55:46.598108+09:00	   17 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-09T22:55:46.599627+09:00	   17 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T22:55:46.608616+09:00	   17 Query	BEGIN
+2024-09-09T22:55:46.612808+09:00	   17 Prepare	INSERT INTO `todolist`.`User` (`id`,`email`,`name`,`password`,`role`,`createdAt`,`updatedAt`) VALUES (?,?,?,?,?,?,?)
+2024-09-09T22:55:46.612957+09:00	   17 Execute	INSERT INTO `todolist`.`User` (`id`,`email`,`name`,`password`,`role`,`createdAt`,`updatedAt`) VALUES ('58e116a2-78e5-49da-88ce-a1b21b5528ac','U2FsdGVkX1+dyXv4bgm7/c+bZRncbJ3T4T1BvYh8KqLI6f0IeyZqPvtnwdn0fIV0','username2','U2FsdGVkX1+9Nod4S9asM49KGvf2q/L+yhmKcPZ4Ses=','USER','2024-09-09 13:55:46.608000','2024-09-09 13:55:46.608000')
+2024-09-09T22:55:46.620599+09:00	   17 Query	ROLLBACK
+2024-09-09T22:59:22.467251+09:00	   18 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T22:59:22.468905+09:00	   18 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T22:59:22.493928+09:00	   18 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-09T22:59:22.495275+09:00	   18 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:01:45.362493+09:00	   18 Query	SELECT 1
+2024-09-09T23:01:45.363609+09:00	   18 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:02:04.163269+09:00	   18 Query	SELECT 1
+2024-09-09T23:02:04.165208+09:00	   18 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:06:38.586791+09:00	   18 Query	SELECT 1
+2024-09-09T23:06:38.588169+09:00	   18 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:12:36.911147+09:00	   19 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T23:12:36.912244+09:00	   19 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T23:12:36.913600+09:00	   19 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-09T23:12:36.913824+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:15:17.080276+09:00	   19 Query	SELECT 1
+2024-09-09T23:15:17.080828+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:15:38.751930+09:00	   19 Query	SELECT 1
+2024-09-09T23:15:38.752403+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:18:38.094500+09:00	   19 Query	SELECT 1
+2024-09-09T23:18:38.095278+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:19:43.426710+09:00	   19 Query	SELECT 1
+2024-09-09T23:19:43.427242+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-09T23:19:43.434362+09:00	   19 Query	BEGIN
+2024-09-09T23:19:43.438350+09:00	   19 Prepare	INSERT INTO `todolist`.`User` (`id`,`email`,`name`,`password`,`role`,`createdAt`,`updatedAt`) VALUES (?,?,?,?,?,?,?)
+2024-09-09T23:19:43.438496+09:00	   19 Execute	INSERT INTO `todolist`.`User` (`id`,`email`,`name`,`password`,`role`,`createdAt`,`updatedAt`) VALUES ('9b9fac98-4b00-4235-bfea-ed53d2caeea0','U2FsdGVkX1+dt4iEHApxE89g8JBinpXp3B1/La1RMd7dsn0iVdrP6u4806KWAZRD','username3','U2FsdGVkX1/3bh9oBGtzvUNGwSiQ2x4dAt2e9U6ugNs=','USER','2024-09-09 14:19:43.432000','2024-09-09 14:19:43.432000')
+2024-09-09T23:19:43.440289+09:00	   19 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE `todolist`.`User`.`id` = ? LIMIT ? OFFSET ?
+2024-09-09T23:19:43.440450+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE `todolist`.`User`.`id` = '9b9fac98-4b00-4235-bfea-ed53d2caeea0' LIMIT 1 OFFSET 0
+2024-09-09T23:19:43.440933+09:00	   19 Query	COMMIT
+2024-09-09T23:20:14.266631+09:00	   19 Query	SELECT 1
+2024-09-09T23:20:14.267159+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-09T23:23:50.115246+09:00	   19 Query	SELECT 1
+2024-09-09T23:23:50.115797+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-09T23:25:01.065473+09:00	   20 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T23:25:01.066626+09:00	   20 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T23:25:01.069336+09:00	   21 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T23:25:01.069571+09:00	   20 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE 1=1 ORDER BY `todolist`.`User`.`id` ASC LIMIT ? OFFSET ?
+2024-09-09T23:25:01.069956+09:00	   20 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE 1=1 ORDER BY `todolist`.`User`.`id` ASC LIMIT 100 OFFSET 0
+2024-09-09T23:25:01.070109+09:00	   21 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T23:25:01.070813+09:00	   21 Prepare	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T23:25:01.070964+09:00	   21 Execute	SELECT COUNT(*) FROM (SELECT `todolist`.`User`.`id` FROM `todolist`.`User` WHERE 1=1) AS `sub`
+2024-09-09T23:25:01.071726+09:00	   20 Prepare	SELECT `todolist`.`Todo`.`itemId`, `todolist`.`Todo`.`authorId` FROM `todolist`.`Todo` WHERE `todolist`.`Todo`.`authorId` IN (?,?)
+2024-09-09T23:25:01.071857+09:00	   20 Execute	SELECT `todolist`.`Todo`.`itemId`, `todolist`.`Todo`.`authorId` FROM `todolist`.`Todo` WHERE `todolist`.`Todo`.`authorId` IN ('9b9fac98-4b00-4235-bfea-ed53d2caeea0','f673263a-0f76-4a42-a723-cc3648118281')
+2024-09-09T23:27:41.829648+09:00	   19 Query	SELECT 1
+2024-09-09T23:27:41.830677+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-09T23:28:23.145209+09:00	   19 Query	SELECT 1
+2024-09-09T23:28:23.145838+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-09T23:28:45.650809+09:00	   19 Query	SELECT 1
+2024-09-09T23:28:45.651373+09:00	   19 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-09T23:41:20.511018+09:00	   22 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-09T23:41:20.511525+09:00	   22 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-09T23:41:20.512238+09:00	   22 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-09T23:41:20.512377+09:00	   22 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:42:11.486506+09:00	   22 Query	SELECT 1
+2024-09-09T23:42:11.487003+09:00	   22 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0
+2024-09-09T23:45:52.002476+09:00	   22 Query	SELECT 1
+2024-09-09T23:45:52.003207+09:00	   22 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:19:06.197198+09:00	   23 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-10T00:19:06.199418+09:00	   23 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-10T00:19:06.204987+09:00	   23 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-10T00:19:06.205130+09:00	   23 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:24:34.123480+09:00	   24 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-10T00:24:34.124593+09:00	   24 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-10T00:24:34.125621+09:00	   24 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-10T00:24:34.125754+09:00	   24 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:25:38.514126+09:00	   24 Query	SELECT 1
+2024-09-10T00:25:38.514825+09:00	   24 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:26:13.420334+09:00	   24 Query	SELECT 1
+2024-09-10T00:26:13.420877+09:00	   24 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:27:51.860119+09:00	   24 Query	SELECT 1
+2024-09-10T00:27:51.860781+09:00	   24 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:28:45.788200+09:00	   24 Query	SELECT 1
+2024-09-10T00:28:45.788749+09:00	   24 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:29:53.917578+09:00	   24 Query	SELECT 1
+2024-09-10T00:29:53.918196+09:00	   24 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:33:17.867955+09:00	   24 Query	SELECT 1
+2024-09-10T00:33:17.868782+09:00	   24 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:34:13.968358+09:00	   24 Query	SELECT 1
+2024-09-10T00:34:13.969029+09:00	   24 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T00:55:30.704745+09:00	   25 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-10T00:55:30.705922+09:00	   25 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-10T00:55:30.707623+09:00	   25 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-10T00:55:30.707836+09:00	   25 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username3@hoge.hoge' OR `todolist`.`User`.`name` = 'username3') LIMIT 1 OFFSET 0
+2024-09-10T01:02:49.533271+09:00	   26 Connect	user@172.18.0.3 on todolist using TCP/IP
+2024-09-10T01:02:49.533982+09:00	   26 Query	SELECT @@socket, @@max_allowed_packet, @@wait_timeout
+2024-09-10T01:02:49.534749+09:00	   26 Prepare	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = ? OR `todolist`.`User`.`name` = ?) LIMIT ? OFFSET ?
+2024-09-10T01:02:49.534872+09:00	   26 Execute	SELECT `todolist`.`User`.`id`, `todolist`.`User`.`email`, `todolist`.`User`.`name`, `todolist`.`User`.`password`, `todolist`.`User`.`role`, `todolist`.`User`.`createdAt`, `todolist`.`User`.`updatedAt` FROM `todolist`.`User` WHERE (`todolist`.`User`.`email` = 'username2@hoge.hoge' OR `todolist`.`User`.`name` = 'username2') LIMIT 1 OFFSET 0

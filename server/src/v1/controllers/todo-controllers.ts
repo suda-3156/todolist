@@ -1,6 +1,7 @@
 
 import { Request, Response } from "express"
 import { prisma } from "../../index"
+import { ProblemDetails, SuccessResponse, TodoResponse } from "../type"
 
 
 
@@ -15,9 +16,10 @@ export const upsertItem = async (req: Request, res: Response) => {
       title: req.body.todo.title,
       completed: req.body.todo.completed,
       deleted: req.body.todo.deleted,
-      authorId: req.body.user.id
+      authorId: req.body.user.id,
+      author: req.body.user.name
     },
-      update: {
+    update: {
       title: req.body.todo.title,
       completed: req.body.todo.completed,
       deleted: req.body.todo.deleted
@@ -25,21 +27,19 @@ export const upsertItem = async (req: Request, res: Response) => {
   })
 
   if ( !todo ) {
-    return res.status(500).json({
-      responseCd: "-1",
-      data: {
-        errors: [
-          "SYSTEM_ERROR"
-        ]
-      }
-    })
+    const response :ProblemDetails = {
+      title: "DATABASE_ERROR",
+      detail: "Cannot create or update the todo item.",
+      type: "SYSTEM_ERROR",
+      status: 500,
+    }
+    return res.status(500).json(response)
   }
-
-  return res.status(200).json({
-    responseCd: "0",
-    data: { todo }
-  })
-  
+  const response :TodoResponse = {
+    title: "UPSERT_ITEM",
+    todo: todo
+  } 
+  return res.status(200).json(response)
 }
 
 export const deleteItem = async (req: Request, res: Response) => {
@@ -50,18 +50,17 @@ export const deleteItem = async (req: Request, res: Response) => {
   })
   
   if ( !result ) {
-    return res.status(500).json({
-      responseCd: "-1",
-      data: {
-        errors: [
-          "SYSTEM_ERROR"
-        ]
-      }
-    })
+    const response :ProblemDetails = {
+      title: "DATABASE_ERROR",
+      detail: "Cannot delete the todo item.",
+      type: "SYSTEM_ERROR",
+      status: 500,
+    }
+    return res.status(500).json(response)
   }
 
-  return res.status(200).json({
-    responseCd: "0",
-    data: {}
-  })
+  const response :SuccessResponse = {
+    title: "DELETE_ITEM"
+  } 
+  return res.status(200).json(response)
 }

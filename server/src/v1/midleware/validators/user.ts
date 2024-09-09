@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { z } from "zod"
 import { prisma } from "../../../index"
+import { ValidationProblemDetails } from "../../type"
 
 
 const UserRegisterSchema = z.object({
@@ -21,36 +22,33 @@ const UserRegisterSchema = z.object({
 
 export const isUserRegister = async (req: Request, res: Response, next: NextFunction) => {
   const result = UserRegisterSchema.safeParse(req.body.user)
-
   if(!result.success) {
-    return res.status(400).json({
-      responseCd: "-2",
-      data: {
-        errors: [
-          "PARAMETER_ERROR",
-          result.error
-        ]
-      }
-    })
+    const response :ValidationProblemDetails = {
+      title: "VALIDATION_ERROR",
+      detail: "Request must include user type.",
+      type: "VALIDATION_ERROR",
+      status: 422,
+      errors: result.error
+    }
+    return res.status(422).json(response)
   }
 
-  await prisma.user.findFirst({
+  const user = await prisma.user.findFirst({
     where: { OR : [
       {email: req.body.user.email},
       {name: req.body.user.name}
     ]}
-  }).then((user) => {
-    if (user) {
-      return res.status(401).json({
-        responseCd: "1",
-        data: {
-          errors: [
-            "INVALID_NAME_OR_PASSWORD"
-          ]
-        }
-      }) 
-    }
   })
+
+  if (user) {
+    const response :ValidationProblemDetails = {
+      title: "INVALID_NAME_OR_EMAIL",
+      detail: "This username or email is already used.",
+      type: "VALIDATION_ERROR",
+      status: 422
+    }
+    return res.status(422).json(response)
+  }
 
   next()
 }
@@ -70,15 +68,14 @@ export const isUserLogin = (req: Request, res: Response, next: NextFunction) => 
   const result = UserLoginSchema.safeParse(req.body.user)
 
   if(!result.success) {
-    return res.status(400).json({
-      responseCd: "-2",
-      data: {
-        errors: [
-          "PARAMETER_ERROR",
-          result.error
-        ]
-      }
-    })
+    const response :ValidationProblemDetails = {
+      title: "VALIDATION_ERROR",
+      detail: "Request must include user with name and password.",
+      type: "VALIDATION_ERROR",
+      status: 422,
+      errors: result.error
+    }
+    return res.status(422).json(response)
   }
   next()
 }

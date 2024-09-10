@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import JWT from "jsonwebtoken"
 import { prisma } from "../../../index";
-import { ProblemDetails } from "../../type";
+import { ApiErrorType } from "../../type";
 
 type TokenPayload = {
   id: string,
@@ -10,9 +10,12 @@ type TokenPayload = {
 }
 
 const tokenDecode = (req :Request) => {
-  const bearerHeader = req.headers["Authorization"]
+  const bearerHeader = req.headers["authorization"]
+  console.log(bearerHeader)
+  console.log(req.headers)
   if ( bearerHeader ) {
-    const bearer = bearerHeader[0].split(" ")[1]
+    const bearer = bearerHeader.split(" ")[1]
+    console.log(bearer)
     try {
       const decodedToken = JWT.verify(bearer, process.env.TOKEN_SECRET_KEY!) as TokenPayload
       return decodedToken
@@ -29,10 +32,10 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
       where: { id: tokenDecoded.id }
     })
     if ( !user ) {
-      const response :ProblemDetails = {
+      const response :ApiErrorType = {
         title: "USER_NOT_FOUND",
-        detail: "Cannot find user with given id.",
-        type: "SYSTEM_ERROR",
+        message: "Cannot find user with given id.",
+        category: "SYSTEM_ERROR",
         status: 500
       }
       return res.status(500).json(response)
@@ -40,12 +43,12 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
     req.body.user = user
     next()
   } else {
-    const response :ProblemDetails = {
+    const response :ApiErrorType = {
       title: "USER_NOT_FOUND",
-      detail: "Cannot find user with given id.",
-      type: "AUTHENTICATION_FAILED",
-      status: 401
+      message: "Cannot find user with given id.",
+      category: "AUTHENTICATION_FAILED",
+      status: 403
     }
-    return res.status(401).json(response)
+    return res.status(403).json(response)
   }
 }

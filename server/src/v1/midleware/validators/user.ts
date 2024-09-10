@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { z } from "zod"
 import { prisma } from "../../../index"
-import { ValidationProblemDetails } from "../../type"
+import { ValidationApiErrorType } from "../../type"
 
 
 const UserRegisterSchema = z.object({
@@ -23,10 +23,10 @@ const UserRegisterSchema = z.object({
 export const isUserRegister = async (req: Request, res: Response, next: NextFunction) => {
   const result = UserRegisterSchema.safeParse(req.body.user)
   if(!result.success) {
-    const response :ValidationProblemDetails = {
+    const response :ValidationApiErrorType = {
       title: "VALIDATION_ERROR",
-      detail: "Request must include user type.",
-      type: "VALIDATION_ERROR",
+      message: "Request must include user type.",
+      category: "VALIDATION_ERROR",
       status: 422,
       errors: result.error
     }
@@ -41,10 +41,10 @@ export const isUserRegister = async (req: Request, res: Response, next: NextFunc
   })
 
   if (user) {
-    const response :ValidationProblemDetails = {
+    const response :ValidationApiErrorType = {
       title: "INVALID_NAME_OR_EMAIL",
-      detail: "This username or email is already used.",
-      type: "VALIDATION_ERROR",
+      message: "This username or email is already used.",
+      category: "VALIDATION_ERROR",
       status: 422
     }
     return res.status(422).json(response)
@@ -68,10 +68,10 @@ export const isUserLogin = (req: Request, res: Response, next: NextFunction) => 
   const result = UserLoginSchema.safeParse(req.body.user)
 
   if(!result.success) {
-    const response :ValidationProblemDetails = {
+    const response :ValidationApiErrorType = {
       title: "VALIDATION_ERROR",
-      detail: "Request must include user with name and password.",
-      type: "VALIDATION_ERROR",
+      message: "Request must include user with name and password.",
+      category: "VALIDATION_ERROR",
       status: 422,
       errors: result.error
     }

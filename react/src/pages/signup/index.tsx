@@ -1,3 +1,12 @@
+/**
+ * Sign Up Page
+ */
+import { useAlertModalStore, useUserStore } from "@/store"
+import { Link, useNavigate } from "react-router-dom"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm, FormProvider } from "react-hook-form"
+
+import { AnimatedDiv } from "@/components/utils/animation"
 import {
   Card,
   CardContent,
@@ -5,17 +14,13 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Link, useNavigate } from "react-router-dom"
+
+import { SignUpAPI } from "@/api/signUpApi"
 import { SignupFormInputSchema, SignupFormSchema } from "./schema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, FormProvider } from "react-hook-form"
-import { AnimatedDiv } from "@/components/utils/animation"
-import { SignUp, signUpAPI, UnknownSystemError } from "@/api/auth"
-import { useTodoListStore } from "@/components/store"
-import { DetailedApiError, UnknownApiError, ValidationApiError } from "@/api/api-base"
+
+
 
 export const Signup = () =>  {
-
   return (
     <AnimatedDiv className="w-screen h-screen min-w-[500px] min-h-[380px] flex flex-col justify-center items-center space-y-4">
       <div className="flex justify-center">
@@ -36,50 +41,40 @@ export const Signup = () =>  {
 
 
 const SignupForm = () => {
-  const { setUser } = useTodoListStore()
-  const { setToken } = useTodoListStore()
-  const navigate = useNavigate()
-
   const methods = useForm<SignupFormInputSchema>({
     resolver: zodResolver(SignupFormSchema),
     defaultValues: {
-        name: undefined,
-        password: undefined
+      name: undefined,
+      password: undefined
     },
   })
 
-  // const onSubmit = async (data: SignupFormInputSchema) => {
-  //   try {
-  //     const result = await signUpAPI({ name: data.name, email: data.email, password: data.password })
-  //     setUser(result.user)
-  //     setToken(result.token)
-  //     navigate("/top")
-  //   } catch (error) {
-  //     if (error instanceof ValidationApiError) {
-  //       switch (error.type) {
-  //         case "VALIDATION_ERROR":
-  //           alert(error.message)
-  //           return
-  //         default:
-  //           alert("try again")
-  //           return
-  //       }
-  //     }
-  //     alert("unknown error")
-  //   } finally {
-  //     methods.reset()
-  //   }
-  // }
+  const { setUser } = useUserStore()
+  const { setToken } = useUserStore()
+  const navigate = useNavigate()
+  const { setAlertModal } = useAlertModalStore()
 
   const onSubmit = async (data: SignupFormInputSchema) => {
-    const Result = await SignUp(data)
+    const Result = await SignUpAPI(data)
+    // 異常系
     if (Result.isFailure()) {
-      return alert("_ERROR")
+      switch (Result.error.category) {
+        case "VALIDATION_ERROR":
+          setAlertModal({ title: "Validation Error", message: "This will be replaced.", url: "/sing-up", isCancenable: false})
+          return
+        default:
+          setAlertModal({ title: "System Error", message: "Something went wrong. Try again later.", url: "/sign-up", isCancenable: false })
+          return
+      }
     }
-    
-
+    // 正常系
+    setUser(Result.value.user)
+    setToken(Result.value.token)
+    methods.reset()
+    navigate("/top")
   }
-  // TODO: cn使う
+  
+  // TODO: cn使う フォームコンポーネントをまとめる
   return (
     <Card className="w-[500px] h-[575px] p-6">
       <CardContent >

@@ -613,3 +613,15 @@
 2024-09-10T20:44:37.580340+09:00 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.4.2).
 2024-09-10T20:44:38.924775+09:00 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.4.2)  MySQL Community Server - GPL.
 2024-09-10T20:44:38.924834+09:00 0 [System] [MY-015016] [Server] MySQL Server - end.
+2024-09-10T20:52:27.338632+09:00 0 [System] [MY-015015] [Server] MySQL Server - start.
+2024-09-10T20:52:27.533478+09:00 0 [System] [MY-010116] [Server] /usr/sbin/mysqld (mysqld 8.4.2) starting as process 1
+2024-09-10T20:52:27.553615+09:00 1 [System] [MY-013576] [InnoDB] InnoDB initialization has started.
+2024-09-10T20:52:27.794577+09:00 1 [System] [MY-013577] [InnoDB] InnoDB initialization has ended.
+2024-09-10T20:52:28.023914+09:00 0 [Warning] [MY-010068] [Server] CA certificate ca.pem is self signed.
+2024-09-10T20:52:28.024102+09:00 0 [System] [MY-013602] [Server] Channel mysql_main configured to support TLS. Encrypted connections are now supported for this channel.
+2024-09-10T20:52:28.028848+09:00 0 [Warning] [MY-011810] [Server] Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.
+2024-09-10T20:52:28.056952+09:00 0 [System] [MY-011323] [Server] X Plugin ready for connections. Bind-address: '::' port: 33060, socket: /var/run/mysqld/mysqlx.sock
+2024-09-10T20:52:28.057052+09:00 0 [System] [MY-010931] [Server] /usr/sbin/mysqld: ready for connections. Version: '8.4.2'  socket: '/var/run/mysqld/mysqld.sock'  port: 3306  MySQL Community Server - GPL.
+2024-09-11T01:17:17.167220+09:00 0 [System] [MY-013172] [Server] Received SHUTDOWN from user <via user signal>. Shutting down mysqld (Version: 8.4.2).
+2024-09-11T01:17:18.058898+09:00 0 [System] [MY-010910] [Server] /usr/sbin/mysqld: Shutdown complete (mysqld 8.4.2)  MySQL Community Server - GPL.
+2024-09-11T01:17:18.059133+09:00 0 [System] [MY-015016] [Server] MySQL Server - end.

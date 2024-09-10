@@ -1,64 +1,38 @@
-import { ZodError } from "zod"
+import { ApiError, ValidationApiError } from "./base/type";
 
 
-export type ErrorType = 
-  | "BAD_REQUEST"           //bad request 400
-  | "UNAUTHORIZED"          //認証エラー 401
-  | "AUTHENTICATION_FAILED" //権限なし 403
-  | "NOT_FOUND"             //not found 404
-  | "VALIDATION_ERROR"      //バリデーションエラー 422
-  | "SYSTEM_ERROR"          //internal server error 500
-  | "OTHERS"
+export type ApiFailureType = ApiError | ValidationApiError
 
-type HTTPStatusCode = number
+export type ApiResult<T, E extends Error> = Success<T> | Failure<E>;
 
-export type ProblemDetails = {
-  title: string,
-  detail?: string,
-  type: ErrorType,
-  status?: HTTPStatusCode
-}
+export class Success<T> {
+  readonly value: T;
 
-export type ValidationProblemDetails = ProblemDetails & {
-  errors?: ZodError
-}
+  constructor(value: T) {
+    this.value = value;
+  }
 
-export type SuccessResponse = {
-  title: string,
-}
+  isSuccess(): this is Success<T> {
+    return true;
+  }
 
-export type TodoType = {
-  itemId: string;
-  title: string;
-  completed: boolean;
-  deleted: boolean;
-  authorId: string;
-}
-
-
-export type TodoResponse = SuccessResponse & {
-  todo: TodoType
-}
-
-
-export type TodoListResponse = SuccessResponse & {
-  todolist: TodoType[]
-}
-
-export type Token = {
-  token: {
-    accessToken: string
+  isFailure(): this is Failure<Error> {
+    return false;
   }
 }
 
-export type User = {
-  user: { 
-    name: string,
-    email: string,
-    role: "USER" | "ADMIN"
+export class Failure<E extends Error> {
+  readonly error: E;
+
+  constructor(error: E) {
+    this.error = error;
+  }
+
+  isSuccess(): this is Success<unknown> {
+    return false;
+  }
+
+  isFailure(): this is Failure<E> {
+    return true;
   }
 }
-
-export type UserTokenResponse = SuccessResponse & Token & User
-
-export type UserResponse = SuccessResponse & User

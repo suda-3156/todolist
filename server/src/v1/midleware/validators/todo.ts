@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express"
 import { z } from "zod"
-import { ValidationProblemDetails } from "../../type"
+import { ValidationApiErrorType } from "../../type"
 
 
 const TodoItemSchema = z.object({
@@ -14,10 +14,10 @@ export const isTodoItem = (req: Request, res: Response, next: NextFunction) => {
   const result = TodoItemSchema.safeParse(req.body.todo)
 
   if (!result.success) {
-    const response :ValidationProblemDetails = {
+    const response :ValidationApiErrorType = {
       title: "VALIDATION_ERROR",
-      detail: "Request must include todo item.",
-      type: "VALIDATION_ERROR",
+      message: "Request must include todo item.",
+      category: "VALIDATION_ERROR",
       status: 422,
       errors: result.error
     }

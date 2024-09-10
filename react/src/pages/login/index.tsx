@@ -1,3 +1,11 @@
+/**
+ * Login Page
+ */
+import { useAlertModalStore, useUserStore } from "@/store"
+import { Link, useNavigate } from "react-router-dom"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useForm, FormProvider } from "react-hook-form"
+
 import {
   Card,
   CardContent,
@@ -5,14 +13,14 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Link } from "react-router-dom"
-import { LoginFormInputSchema, LoginFormSchema } from "./schema"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm, FormProvider } from "react-hook-form"
 import { AnimatedDiv } from "@/components/utils/animation"
 
-export const Login = () =>  {
+import { LoginAPI } from "@/api/loginApi"
+import { LoginFormInputSchema, LoginFormSchema } from "./schema"
 
+
+
+export const Login = () =>  {
   return (
     <AnimatedDiv className="w-screen h-screen min-w-[500px] min-h-[380px] flex flex-col justify-center items-center space-y-4">
       <div className="flex justify-center">
@@ -41,10 +49,38 @@ const LoginForm = () => {
     },
   })
 
-  const onSubmit = (data: LoginFormInputSchema) => {
-    console.log(data)
+  const { setUser } = useUserStore()
+  const { setToken } = useUserStore()
+  const navigate = useNavigate()
+  const { setAlertModal, openAlertModal } = useAlertModalStore()
+
+  const onSubmit = async (data: LoginFormInputSchema) => {
+    const Result = await LoginAPI(data)
+    // 異常系
+    if (Result.isFailure()) {
+      switch (Result.error.category) {
+        case "VALIDATION_ERROR":
+          setAlertModal({ title: "System Error", message: "Something went wrong. Try again.", url: "/login", isCancenable: false })
+          openAlertModal()
+          return
+        case "UNAUTHORIZED":
+          setAlertModal({ title: "Authentication Error", message: "Username or password is wrong. Try again.", url: "/login", isCancenable: false })
+          openAlertModal()
+          return
+        default:
+          setAlertModal({ title: "System Error", message: "Something went wrong. Try again later.", url: "/login", isCancenable: false })
+          openAlertModal()
+          return
+      }
+    }
+    // 正常系
+    setUser(Result.value.user)
+    setToken(Result.value.token)
+    methods.reset()
+    navigate("/top")
   }
 
+  // TODO: cn使う フォームコンポーネントをまとめる
   return (
     <Card className="w-[500px] h-[380px] p-6">
       <CardContent >

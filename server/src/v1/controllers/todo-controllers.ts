@@ -1,7 +1,7 @@
 
 import { Request, Response } from "express"
 import { prisma } from "../../index"
-import { ProblemDetails, SuccessResponse, TodoResponse } from "../type"
+import { ApiErrorType, SuccessResponse, TodoResponse } from "../type"
 
 
 
@@ -27,10 +27,10 @@ export const upsertItem = async (req: Request, res: Response) => {
   })
 
   if ( !todo ) {
-    const response :ProblemDetails = {
+    const response :ApiErrorType = {
       title: "DATABASE_ERROR",
-      detail: "Cannot create or update the todo item.",
-      type: "SYSTEM_ERROR",
+      message: "Cannot create or update the todo item.",
+      category: "SYSTEM_ERROR",
       status: 500,
     }
     return res.status(500).json(response)
@@ -50,10 +50,10 @@ export const deleteItem = async (req: Request, res: Response) => {
   })
   
   if ( !result ) {
-    const response :ProblemDetails = {
+    const response :ApiErrorType = {
       title: "DATABASE_ERROR",
-      detail: "Cannot delete the todo item.",
-      type: "SYSTEM_ERROR",
+      message: "Cannot delete the todo item.",
+      category: "SYSTEM_ERROR",
       status: 500,
     }
     return res.status(500).json(response)

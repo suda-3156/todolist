@@ -1,5 +1,11 @@
+import { TokenType } from "@/type"
 
 
-export const getAccessToken = () => {
-  return localStorage.getItem("accessToken")
+export const getTokenFromStorage = () :TokenType => {
+  const accessToken = localStorage.getItem("accessToken") ?? ""
+  return { accessToken: accessToken } 
+}
+
+export const setTokenToStorage = (token: TokenType) => {
+  localStorage.setItem("accessToken", token.accessToken)
 }

@@ -3,7 +3,7 @@ import { verifyToken } from "../midleware/auth-checkers/token";
 import { prisma } from "../../index"
 import { upsertItem, deleteItem } from "../controllers/todo-controllers";
 import { isTodoItem } from "../midleware/validators/todo";
-import { ProblemDetails, TodoListResponse } from "../type";
+import { ApiErrorType, TodoListResponse } from "../type";
 
 const router = Router()
 
@@ -25,10 +25,10 @@ router.post("/all", verifyToken, async (req: Request, res: Response) => {
       }
     })
     if (!data) {
-      const response :ProblemDetails = {
+      const response :ApiErrorType = {
         title: "DATABASE_ERROR",
-        detail: "Cannot access to the database.",
-        type: "SYSTEM_ERROR",
+        message: "Cannot access to the database.",
+        category: "SYSTEM_ERROR",
         status: 500,
       }
       return res.status(500).json(response)
@@ -39,10 +39,10 @@ router.post("/all", verifyToken, async (req: Request, res: Response) => {
     }
     return res.status(200).json(response)
   } catch (error) {
-    const response :ProblemDetails = {
+    const response :ApiErrorType = {
       title: "DATABASE_ERROR",
-      detail: "Cannot access to the database.",
-      type: "SYSTEM_ERROR",
+      message: "Cannot access to the database.",
+      category: "SYSTEM_ERROR",
       status: 500,
     }
     return res.status(500).json(response)

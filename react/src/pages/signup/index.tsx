@@ -10,9 +10,9 @@ import { SignupFormInputSchema, SignupFormSchema } from "./schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, FormProvider } from "react-hook-form"
 import { AnimatedDiv } from "@/components/utils/animation"
-import { signUpAPI } from "@/api/auth"
+import { SignUp, signUpAPI, UnknownSystemError } from "@/api/auth"
 import { useTodoListStore } from "@/components/store"
-import { ValidationApiError } from "@/api/api-base"
+import { DetailedApiError, UnknownApiError, ValidationApiError } from "@/api/api-base"
 
 export const Signup = () =>  {
 
@@ -48,29 +48,38 @@ const SignupForm = () => {
     },
   })
 
-  const onSubmit = async (data: SignupFormInputSchema) => {
-    try {
-      const result = await signUpAPI({ name: data.name, email: data.email, password: data.password })
-      setUser(result.user)
-      setToken(result.token)
-      navigate("/top")
-    } catch (error) {
-      if (error instanceof ValidationApiError) {
-        switch (error.type) {
-          case "VALIDATION_ERROR":
-            alert(error.message)
-            return
-          default:
-            alert("try again")
-            return
-        }
-      }
-      alert("unknown error")
-    } finally {
-      methods.reset()
-    }
-  }
+  // const onSubmit = async (data: SignupFormInputSchema) => {
+  //   try {
+  //     const result = await signUpAPI({ name: data.name, email: data.email, password: data.password })
+  //     setUser(result.user)
+  //     setToken(result.token)
+  //     navigate("/top")
+  //   } catch (error) {
+  //     if (error instanceof ValidationApiError) {
+  //       switch (error.type) {
+  //         case "VALIDATION_ERROR":
+  //           alert(error.message)
+  //           return
+  //         default:
+  //           alert("try again")
+  //           return
+  //       }
+  //     }
+  //     alert("unknown error")
+  //   } finally {
+  //     methods.reset()
+  //   }
+  // }
 
+  const onSubmit = async (data: SignupFormInputSchema) => {
+    const Result = await SignUp(data)
+    if (Result.isFailure()) {
+      return alert("_ERROR")
+    }
+    
+
+  }
+  // TODO: cn使う
   return (
     <Card className="w-[500px] h-[575px] p-6">
       <CardContent >

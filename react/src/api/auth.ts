@@ -1,4 +1,5 @@
-import { apiClient, ValidationApiError } from "./api-base"
+import { ApiResult, Failure, Success } from "@/components/utils/ApiResult"
+import { apiClient, DetailedApiError, UnknownApiError, ValidationApiError } from "./api-base"
 import { UserResponse, UserTokenResponse } from "./type"
 
 export type LoginAPIRequest = {
@@ -23,48 +24,20 @@ export const signUpAPI = async ({ name, email, password } :SignUpAPIRequest) :Pr
   return response.data
 }
 
+export class UnknownSystemError extends Error {}
 
-export type ApiResult<T, E extends Error> = Success<T> | Failure<E>;
-
-class Success<T> {
-  readonly value: T;
-
-  constructor(value: T) {
-    this.value = value;
-  }
-
-  isSuccess(): this is Success<T> {
-    return true;
-  }
-
-  isFailure(): this is Failure<Error> {
-    return false;
-  }
-}
-
-class Failure<E extends Error> {
-  readonly error: E;
-
-  constructor(error: E) {
-    this.error = error;
-  }
-
-  isSuccess(): this is Success<unknown> {
-    return false;
-  }
-
-  isFailure(): this is Failure<E> {
-    return true;
-  }
-}
-
-
-export const signUpFunc :<UserTokenResponse, ValidationApiError> = (signUpAPI , onCatch: (e :unknown) => ValidationApiError ) :ApiResult<UserTokenResponse, ValidationApiError> => {
+export const SignUp = async ({ name, email, password } :SignUpAPIRequest) :Promise<ApiResult<
+  UserTokenResponse,
+  ValidationApiError | DetailedApiError | UnknownApiError | UnknownSystemError
+>> => {
   try {
-    const value = signUpAPI()
-    return new Success<T>(value)
+    const value = await apiClient.post<UserTokenResponse>("/auth/register", {user: { name, email, password }})
+    return new Success<UserTokenResponse>(value.data)
   } catch (error) {
-    return new Failure<E>(onCatch(error))
+    if (error instanceof ValidationApiError) return new Failure<ValidationApiError>(error)
+    if (error instanceof DetailedApiError) return new Failure<DetailedApiError>(error)
+    if (error instanceof UnknownApiError) return new Failure<UnknownApiError>(error)
+    return new Failure<UnknownSystemError>(new UnknownSystemError("Unknown System error"))
   }
 }
 

@@ -1,6 +1,6 @@
 export type ApiResult<T, E extends Error> = Success<T> | Failure<E>;
 
-class Success<T> {
+export class Success<T> {
   readonly value: T;
 
   constructor(value: T) {
@@ -16,7 +16,7 @@ class Success<T> {
   }
 }
 
-class Failure<E extends Error> {
+export class Failure<E extends Error> {
   readonly error: E;
 
   constructor(error: E) {

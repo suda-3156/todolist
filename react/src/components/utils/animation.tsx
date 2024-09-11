@@ -1,3 +1,6 @@
+/**
+ * fade in animation for pages
+ */
 import React, { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 

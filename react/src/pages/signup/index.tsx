@@ -1,7 +1,8 @@
 /**
  * Sign Up Page
  */
-import { useAlertModalStore, useUserStore } from "@/store"
+import { useAlertModalStore } from "@/store/alertModalStore"
+import { useUserStore } from "@/store/userStore"
 import { Link, useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, FormProvider } from "react-hook-form"
@@ -71,7 +72,7 @@ const SignupForm = () => {
     setUser(Result.value.user)
     setToken(Result.value.token)
     methods.reset()
-    navigate("/top")
+    navigate("/private/top")
   }
   
   // TODO: cn使う フォームコンポーネントをまとめる

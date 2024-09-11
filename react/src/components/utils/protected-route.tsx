@@ -3,8 +3,9 @@
  * 認証済みの場合のみ閲覧できるページにかぶせる
  */
 import { VerifyTokenAPI } from "@/api/verifyTokenApi"
-import { useAlertModalStore, useLoading, useUserStore } from "@/store"
-import { FC, useEffect } from "react"
+import { useUserStore } from "@/store/userStore"
+import { useAlertModalStore } from "@/store/alertModalStore"
+import { FC, useEffect, useState } from "react"
 import { Navigate, Outlet } from "react-router-dom"
 import { Loading } from "../modules/login"
 
@@ -15,11 +16,12 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
   const { setAlertModal, openAlertModal } = useAlertModalStore()
   const { setUser, setToken, user } = useUserStore()
-  const { isLoading, setIsLoading } = useLoading()
+  //TODO: このページだけのローディングを使っているのよくない気がする
+  const [ isThisLoading, setIsThisLoading ] = useState(true)
 
   useEffect(() => {
     const verify = async () => {
-      setIsLoading(true)
+      setIsThisLoading(true)
       const Result = await VerifyTokenAPI()
       if (Result.isFailure()) {
         switch (Result.error.category) {
@@ -28,25 +30,25 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
             openAlertModal()
             setUser(null)
             setToken(null)
-            setIsLoading(false)
+            setIsThisLoading(false)
             return
           default:
             setAlertModal({ title: "System Error", message: "Something went wrong. Try again later.", url: "/login", isCancenable: false })
             openAlertModal()
             setUser(null)
             setToken(null)
-            setIsLoading(false)
+            setIsThisLoading(false)
             return
         }
       }
       setUser(Result.value.user)
-      setIsLoading(false)
+      setIsThisLoading(false)
     }
     verify()
-  },[openAlertModal, setAlertModal, setIsLoading, setToken, setUser])
+  },[openAlertModal, setAlertModal, setIsThisLoading, setToken, setUser])
 
 
-  if ( isLoading ) {
+  if ( isThisLoading ) {
     return <Loading />
   }
 

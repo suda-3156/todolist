@@ -5,4 +5,4 @@ export const Top = () => {
   )
 }
 
-//TODO: /topをなくし、/private/topのみにする、not found ページ、グローバルローディングの使い方を考える。ユーザー名が入ったURLっていいなsoudemonai?? サーバー側のAPI攻勢を整理する
+//TODO: グローバルローディングの使い方を考える。ユーザー名が入ったURLっていいなsoudemonai?? サーバー側のAPI攻勢を整理する

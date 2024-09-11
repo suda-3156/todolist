@@ -1,6 +1,9 @@
 import { create } from "zustand"
 import { TokenType, UserType } from "@/type"
 import { getTokenFromStorage, setTokenToStorage } from "../components/utils/token"
+// import { LoginFormInputSchema } from "@/pages/login/schema"
+// import { LoginAPI } from "@/api/loginApi"
+// import { handleAlertModal } from "./alertModalStore"
 
 
 /**
@@ -15,7 +18,7 @@ interface UserState {
   user: UserType | null
   token: TokenType | null
   setUser: (user: UserType | null) => void            //ユーザー情報を保存
-  setToken: (token: TokenType | null) => void         //トークンを保存
+  setToken: (token: TokenType | null) => void         //トークンを保存 // TODO: verifyするたびに、レスポンスに新しいアクセストークンを渡すべき？トークンとユーザーを別でセットする場合ってそんなにあるかな
   getToken: () => TokenType | null                    //トークンを取得
   resetAuth: () => void                               //ユーザー情報をトークンを削除 // TODO: storageからも消すように直す
 }
@@ -34,17 +37,34 @@ export const useUserStore = create<UserState>((set,get) => ({
     set(() => ({ token: getTokenFromStorage() }))
     return get().token
   },
-  resetAuth: () => set(() => ({ user: null, token: null })),
+  resetAuth: () => {
+    setTokenToStorage({ accessToken: "" })
+    set(() => ({ user: null, token: null }))
+  },
 }))
 
 
+// export const LoginFunc = async (data: LoginFormInputSchema) => {
+//   const Result = await LoginAPI(data)
+//   // 異常系
+//   if (Result.isFailure()) {
+//     switch (Result.error.category) {
+//       case "VALIDATION_ERROR":
+//         handleAlertModal("VALIDATION_ERROR",Result.error.message)
+//         return
+//       case "UNAUTHORIZED":
+//         handleAlertModal("UNAUTHORIZED")
+//         return
+//       default:
+//         handleAlertModal("UNEXPECTED_ERROR")
+//         return
+//     }
+//   }
+//   // 正常系
+//   console.log("success")
+//   useUserStore.setState({ user: Result.value.user })
+//   setTokenToStorage(Result.value.token ?? { accessToken: "" })
+//   useUserStore.setState({ token: Result.value.token })
+// }
 
-interface Loading {
-  isLoading: boolean,
-  setIsLoading: (flg: boolean) => void
-}
-
-export const useLoading = create<Loading>((set) => ({
-  isLoading: false,
-  setIsLoading: (flg) => set(() => ({ isLoading: flg }))
-}))
+// export const LogoutFunc

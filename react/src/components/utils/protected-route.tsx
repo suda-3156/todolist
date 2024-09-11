@@ -4,18 +4,18 @@
  */
 import { VerifyTokenAPI } from "@/api/verifyTokenApi"
 import { useUserStore } from "@/store/userStore"
-import { useAlertModalStore } from "@/store/alertModalStore"
+import { handleAlertModal } from "@/store/alertModalStore"
 import { FC, useEffect, useState } from "react"
 import { Navigate, Outlet } from "react-router-dom"
-import { Loading } from "../modules/login"
+import { Loading } from "../modules/loading"
 
 interface ProtectedRouteProps {
   redirectTo: string
 }
 
 export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
-  const { setAlertModal, openAlertModal } = useAlertModalStore()
   const { setUser, setToken, user } = useUserStore()
+  const resetAuth = useUserStore((state) => state.resetAuth) 
   //TODO: このページだけのローディングを使っているのよくない気がする
   const [ isThisLoading, setIsThisLoading ] = useState(true)
 
@@ -26,17 +26,13 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
       if (Result.isFailure()) {
         switch (Result.error.category) {
           case "AUTHENTICATION_FAILED":
-            setAlertModal({ title: "Authentication Failed", message: "You're not logged in. Please login.", url: "/login", isCancenable: false })
-            openAlertModal()
-            setUser(null)
-            setToken(null)
+            handleAlertModal("AUTHENTICATION_FAILED")
+            resetAuth()
             setIsThisLoading(false)
             return
           default:
-            setAlertModal({ title: "System Error", message: "Something went wrong. Try again later.", url: "/login", isCancenable: false })
-            openAlertModal()
-            setUser(null)
-            setToken(null)
+            handleAlertModal("UNEXPECTED_ERROR")
+            resetAuth()
             setIsThisLoading(false)
             return
         }
@@ -45,7 +41,7 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
       setIsThisLoading(false)
     }
     verify()
-  },[openAlertModal, setAlertModal, setIsThisLoading, setToken, setUser])
+  },[resetAuth, setIsThisLoading, setToken, setUser])
 
 
   if ( isThisLoading ) {

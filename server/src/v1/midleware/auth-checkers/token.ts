@@ -47,8 +47,8 @@ export const verifyToken = async (req: Request, res: Response, next: NextFunctio
       title: "USER_NOT_FOUND",
       message: "Cannot find user with given id.",
       category: "AUTHENTICATION_FAILED",
-      status: 403
+      status: 401
     }
-    return res.status(403).json(response)
+    return res.status(401).json(response)
   }
 }

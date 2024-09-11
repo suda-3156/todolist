@@ -13,6 +13,7 @@ import { Signup } from "./pages/signup"
 import { AlertModal } from "./components/modules/alertModal"
 import { ProtectedRoute } from "./components/utils/protected-route"
 import { Notfound } from "./pages/notfound"
+import { GlobalLayout } from "./components/layout/global"
 
 function App() {
   return (
@@ -21,7 +22,9 @@ function App() {
         <Route path='/login' element={<Login/>}/>
         <Route path='/sign-up' element={<Signup />}/>
         <Route path="/private" element={<ProtectedRoute redirectTo="/login" />}>
-          <Route path="/private/top" element={<Top />} />
+          <Route element={<GlobalLayout />}>
+            <Route path="top" element={<Top />} />
+          </Route>
         </Route>
         <Route path='*' element={<Notfound />}/>
       </Routes>

@@ -1,7 +1,7 @@
 /**
  * Sign Up Page
  */
-import { useAlertModalStore } from "@/store/alertModalStore"
+import { handleAlertModal } from "@/store/alertModalStore"
 import { useUserStore } from "@/store/userStore"
 import { Link, useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -53,7 +53,6 @@ const SignupForm = () => {
   const { setUser } = useUserStore()
   const { setToken } = useUserStore()
   const navigate = useNavigate()
-  const { setAlertModal } = useAlertModalStore()
 
   const onSubmit = async (data: SignupFormInputSchema) => {
     const Result = await SignUpAPI(data)
@@ -61,10 +60,10 @@ const SignupForm = () => {
     if (Result.isFailure()) {
       switch (Result.error.category) {
         case "VALIDATION_ERROR":
-          setAlertModal({ title: "Validation Error", message: "This will be replaced.", url: "/sing-up", isCancenable: false})
+          handleAlertModal("VALIDATION_ERROR", Result.error.message)
           return
         default:
-          setAlertModal({ title: "System Error", message: "Something went wrong. Try again later.", url: "/sign-up", isCancenable: false })
+          handleAlertModal("UNEXPECTED_ERROR")
           return
       }
     }

@@ -3,7 +3,7 @@
  * 認証にかかわるエラーなどで使う。制御はuseAlertModalStoreから。
 */
 
-import { useAlertModalStore } from "@/store/alertModalStore"
+import { useAlertModalStore } from "../../store/alertModalStore"
 import { useNavigate } from "react-router-dom"
 
 import {

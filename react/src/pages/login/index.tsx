@@ -1,7 +1,7 @@
 /**
  * Login Page
  */
-import { useAlertModalStore } from "@/store/alertModalStore"
+import { handleAlertModal } from "@/store/alertModalStore"
 import { useUserStore } from "@/store/userStore"
 import { Link, useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -53,7 +53,6 @@ const LoginForm = () => {
   const { setUser } = useUserStore()
   const { setToken } = useUserStore()
   const navigate = useNavigate()
-  const { setAlertModal, openAlertModal } = useAlertModalStore()
 
   const onSubmit = async (data: LoginFormInputSchema) => {
     const Result = await LoginAPI(data)
@@ -61,16 +60,13 @@ const LoginForm = () => {
     if (Result.isFailure()) {
       switch (Result.error.category) {
         case "VALIDATION_ERROR":
-          setAlertModal({ title: "System Error", message: "Something went wrong. Try again.", url: "/login", isCancenable: false })
-          openAlertModal()
+          handleAlertModal("VALIDATION_ERROR", Result.error.message)
           return
         case "UNAUTHORIZED":
-          setAlertModal({ title: "Authentication Error", message: "Username or password is wrong. Try again.", url: "/login", isCancenable: false })
-          openAlertModal()
+          handleAlertModal("UNAUTHORIZED")
           return
         default:
-          setAlertModal({ title: "System Error", message: "Something went wrong. Try again later.", url: "/login", isCancenable: false })
-          openAlertModal()
+          handleAlertModal("UNEXPECTED_ERROR")
           return
       }
     }

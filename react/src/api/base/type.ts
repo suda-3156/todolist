@@ -7,8 +7,8 @@ import { ZodError } from "zod"
 
 export type ApiErrorCategory = 
   | "BAD_REQUEST"           //bad request 400
-  | "UNAUTHORIZED"          //認証エラー 401
-  | "AUTHENTICATION_FAILED" //権限なし 403
+  | "UNAUTHORIZED"          //認証エラー 401  invalid username or password系
+  | "AUTHENTICATION_FAILED" //権限なし 403    アカウント変える必要あるとか、ログインしてないのにプライベートページ意向としてるとか
   | "NOT_FOUND"             //not found 404
   | "VALIDATION_ERROR"      //バリデーションエラー 422
   | "SYSTEM_ERROR"          //internal server error 500

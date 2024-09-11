@@ -1,5 +1,5 @@
 import { z } from "zod"
-
+// TODO: スキーマをまとめられないか、入力文字を半角に縛るなどしたい
 export const SignupFormSchema = z.object({
   name: z
     .string({

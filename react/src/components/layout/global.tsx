@@ -7,7 +7,7 @@ import { useUserStore } from "@/store/userStore"
 import { Outlet } from "react-router-dom"
 
 import { ChevronsLeft, SquarePen, CircleUserRound, LogOut, CircleHelp } from "lucide-react"
-import { AnimatedDiv } from "../utils/animation"
+import { AnimatedDiv } from "../wapper/animation"
 
 export const GlobalLayout = () => {
   return (

@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, FormProvider } from "react-hook-form"
 
-import { AnimatedDiv } from "@/components/utils/animation"
+import { AnimatedDiv } from "@/components/wapper/animation"
 import {
   Card,
   CardContent,

@@ -11,7 +11,7 @@ import { Top } from "./pages/top"
 import { Login } from "./pages/login"
 import { Signup } from "./pages/signup"
 import { AlertModal } from "./components/modules/alertModal"
-import { ProtectedRoute } from "./components/utils/protected-route"
+import { ProtectedRoute } from "./components/wapper/protected-route"
 import { Notfound } from "./pages/notfound"
 import { GlobalLayout } from "./components/layout/global"
 

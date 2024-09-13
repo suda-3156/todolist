@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import { TokenType, UserType } from "@/type"
-import { getTokenFromStorage, setTokenToStorage } from "../components/utils/token"
+import { getTokenFromStorage, setTokenToStorage } from "../lib/token"
 // import { LoginFormInputSchema } from "@/pages/login/schema"
 // import { LoginAPI } from "@/api/loginApi"
 // import { handleAlertModal } from "./alertModalStore"

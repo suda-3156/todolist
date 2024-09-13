@@ -18,7 +18,7 @@ import {
   AlertDialogOverlay,
   AlertDialogPortal
 } from "@/components/ui/alert-dialog"
-import { AnimatedDiv } from "../utils/animation"
+import { AnimatedDiv } from "../wapper/animation"
 
 
  

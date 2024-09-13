@@ -23,7 +23,11 @@ import { AnimatedDiv } from "../wapper/animation"
 
  
 export const AlertModal = () => {
-  const { isOpen, title, message, url, isCancenable, closeAlertModal } = useAlertModalStore()
+
+  const isOpen = useAlertModalStore((state) => state.isOpen)
+  const closeAlertModal = useAlertModalStore((state) => state.closeAlertModal)
+  const getDetails = useAlertModalStore((state) => state.getDetails)
+
   const navigate = useNavigate()
 
   const onClickOk = () => {

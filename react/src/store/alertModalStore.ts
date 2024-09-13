@@ -10,36 +10,42 @@ type AlertMOdalCategory =
     | "UNAUTHORIZED"            // 認証エラー、ユーザーはログインしなおす
     | "AUTHENTICATION_FAILED"   // 権限なし、ログインしているユーザーのトップに戻る or log in page
     | "SYSTEM_ERROR"            // 予期せぬエラー、原因がわかってるから知らせてもいい、ユーザーはリトライすRU
+
+type AlertModalSettings = {
+  isCancenable: boolean,
+  title: string,
+  message: string,
+  url: string,
+  okLabel: string
+}
+
 interface AlertModalState {
   isOpen: boolean,
-  // isCancenable: boolean,
-  // title: string,
-  // message: string,
-  // url: string,
-  // okLabel: string,
   category:
   | "UNEXPECTED_ERROR"        // 予期せぬエラー、ユーザーはリトライするしかない
   | "VALIDATION_ERROR"        // validation error、ユーザーは入力しなおす
   | "UNAUTHORIZED"            // 認証エラー、ユーザーはログインしなおす
   | "AUTHENTICATION_FAILED"   // 権限なし、ログインしているユーザーのトップに戻る or log in page
   | "SYSTEM_ERROR"            // 予期せぬエラー、原因がわかってるから知らせてもいい、ユーザーはリトライすRU
+  optionalMessage: string | null,
   closeAlertModal: () => void
-  openAlertModal: ( category: AlertMOdalCategory ) => void
-  get
+  openAlertModal: ( category: AlertMOdalCategory, optionalMessage?: string ) => void
+  getSettings: () => AlertModalSettings
 }
 
 export const useAlertModalStore = create<AlertModalState>((set, get) => ({
   isOpen: false,
   category: "UNEXPECTED_ERROR",
+  optionalMessage: null,
   closeAlertModal: () => set(() => ({ isOpen: false })),
-  openAlertModal: (category) => set(() => ({ isOpen: true, category: category })),
-  getDetail: () => {
+  openAlertModal: (category, optionalMessage) => set(() => ({ isOpen: true, category: category, optionalMessage: optionalMessage ?? null })),
+  getSettings: () => {
     switch( get().category ) {
       case "UNEXPECTED_ERROR":
         return {
           isCancenable: false,
           title: "Unexpected Error",
-          message: "Something went wrong. Please refresh the page or try again later.",
+          message: get().optionalMessage ?? "Something went wrong. Please refresh the page or try again later.",
           url: "/login",
           okLabel: "Back to Login Page"
         }
@@ -47,23 +53,25 @@ export const useAlertModalStore = create<AlertModalState>((set, get) => ({
         return {
           isCancenable: false,
           title: "Validation Error",
-          message: message ?? "The provided information is not valid. Please review and submit again.",
-          url: "",      // 元のページに戻るのみ
+          message: get().optionalMessage ?? "The provided information is not valid. Please review and submit again.",
+          // 元のページに戻るのみ
+          url: "",
           okLabel: "Close"
         }
       case "UNAUTHORIZED":
         return {
           isCancenable: false,
           title: "Unauthorized",
-          message: "Invalid username or password. Please try again.",
+          message: get().optionalMessage ?? "Invalid username or password. Please try again.",
           url: "/login",
           okLabel: "Login"
         }
       case "AUTHENTICATION_FAILED":
         return {
-          isCancenable: true,     // /private/topへ遷移
+          // /private/topへ遷移
+          isCancenable: true,    
           title: "Authentication Failed",
-          message: "Access to this resource is restricted. Please check your permissions.",
+          message: get().optionalMessage ?? "Access to this resource is restricted. Please check your permissions.",
           url: "/login",
           okLabel: "Change account",
         }
@@ -71,8 +79,9 @@ export const useAlertModalStore = create<AlertModalState>((set, get) => ({
         return {
           isCancenable: false,
           title: "System Error",
-          message: message ?? "Something went wrong. Please refresh the page or try again later.",
-          url: "",          // 元のページに戻るのみ
+          message: get().optionalMessage ?? "Something went wrong. Please refresh the page or try again later.",
+          // 元のページに戻るのみ
+          url: "",
           okLabel: "Back"
         }
     }

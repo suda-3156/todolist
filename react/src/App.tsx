@@ -8,18 +8,18 @@ import { Routes, Route } from "react-router-dom"
 import { AnimatePresence } from "framer-motion"
 
 import { Top } from "./pages/top"
-import { Login } from "./pages/login"
+import { LoginForm } from "./pages/login"
 import { Signup } from "./pages/signup"
 import { AlertModal } from "./components/modules/alertModal"
 import { ProtectedRoute } from "./components/wapper/protected-route"
 import { Notfound } from "./pages/notfound"
-import { GlobalLayout } from "./components/layout/global"
+import { GlobalLayout } from "./components/template/global"
 
 function App() {
   return (
     <AnimatePresence>
       <Routes>
-        <Route path='/login' element={<Login/>}/>
+        <Route path='/login' element={<LoginForm />}/>
         <Route path='/sign-up' element={<Signup />}/>
         <Route path="/private" element={<ProtectedRoute redirectTo="/login" />}>
           <Route element={<GlobalLayout />}>

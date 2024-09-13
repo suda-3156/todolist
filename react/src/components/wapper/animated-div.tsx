@@ -18,12 +18,15 @@ const pageVariants = {
 
 const pageTransition = {
   type: 'tween',
-  ease: 'easeInOut',
+  ease: 'easeOut',
 };
 
-export const AnimatedDiv :React.FC<{ children: ReactNode, className?: string }> = ({ children, className }) => {
+export const AnimatedDiv :React.FC<{
+  children: ReactNode,
+  className?: string,
+  onClick?: () => void 
+}> = ({ children, className, onClick }) => {
   return (
-    <>
     <motion.div
       initial="initial"
       animate="in"
@@ -31,9 +34,9 @@ export const AnimatedDiv :React.FC<{ children: ReactNode, className?: string }> 
       variants={pageVariants}
       transition={pageTransition}
       className={className}
+      onClick={onClick}
     >
       {children}
     </motion.div>
-  </>
   )
 }

@@ -1,7 +1,13 @@
+import { useSidebarState } from "@/store/sidebarStore"
 
 export const Top = () => {
+  const toggleSidebar = useSidebarState((state) => state.toggleSidebar)
   return (
-    <div>Top</div>
+    <div className="w-full h-screen flex items-center justify-center gap-5">
+      <button onClick={toggleSidebar}>
+        toggle
+      </button>
+    </div>
   )
 }
 

@@ -2,6 +2,7 @@
  * Global Alert Modal
  * 認証にかかわるエラーなどで使う。制御はuseAlertModalStoreから。
 */
+// TODO: cancelボタンを押したときの振る舞いについて、考える
 
 import { useAlertModalStore } from "../../store/alertModalStore"
 import { useNavigate } from "react-router-dom"
@@ -18,7 +19,7 @@ import {
   AlertDialogOverlay,
   AlertDialogPortal
 } from "@/components/ui/alert-dialog"
-import { AnimatedDiv } from "../wapper/animation"
+import { AnimatedDiv } from "../wapper/animated-div"
 
 
  
@@ -26,12 +27,15 @@ export const AlertModal = () => {
 
   const isOpen = useAlertModalStore((state) => state.isOpen)
   const closeAlertModal = useAlertModalStore((state) => state.closeAlertModal)
-  const getDetails = useAlertModalStore((state) => state.getDetails)
+  const getSettings = useAlertModalStore((state) => state.getSettings)
 
   const navigate = useNavigate()
 
   const onClickOk = () => {
-    navigate(url)
+    const url = getSettings().url
+    if ( url !== ""){
+      navigate(url)
+    }
     closeAlertModal()
   }
 
@@ -39,18 +43,18 @@ export const AlertModal = () => {
     <AnimatedDiv className="fixed top-0 z-[-10] left-0 w-screen h-screen flex justify-center items-center">
       <AlertDialog open={isOpen}>
         <AlertDialogPortal>
-          <AlertDialogOverlay onClick={isCancenable ? closeAlertModal : undefined }/>
+          <AlertDialogOverlay onClick={getSettings().isCancenable ? closeAlertModal : undefined }/>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>{title}</AlertDialogTitle>
-              <AlertDialogDescription>{message}</AlertDialogDescription>
+              <AlertDialogTitle className="text-2xl">{getSettings().title}</AlertDialogTitle>
+              <AlertDialogDescription>{getSettings().message}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               {
-                isCancenable && 
+                getSettings().isCancenable && 
                 <AlertDialogCancel onClick={closeAlertModal}>Cancel</AlertDialogCancel>
               }
-              <AlertDialogAction onClick={onClickOk}>Continue</AlertDialogAction>
+              <AlertDialogAction onClick={onClickOk} className="text-background font-semibold">Continue</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialogPortal>

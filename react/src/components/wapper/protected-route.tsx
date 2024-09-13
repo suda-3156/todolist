@@ -4,7 +4,7 @@
  */
 import { VerifyTokenAPI } from "@/api/verifyTokenApi"
 import { useUserStore } from "@/store/userStore"
-import { handleAlertModal } from "@/store/alertModalStore"
+import { useAlertModalStore } from "@/store/alertModalStore"
 import { FC, useEffect, useState } from "react"
 import { Navigate, Outlet } from "react-router-dom"
 import { Loading } from "../modules/loading"
@@ -16,6 +16,7 @@ interface ProtectedRouteProps {
 export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
   const { setUser, setToken, user } = useUserStore()
   const resetAuth = useUserStore((state) => state.resetAuth) 
+  const openAlertModal = useAlertModalStore((state) => state.openAlertModal)
   //TODO: このページだけのローディングを使っているのよくない気がする
   const [ isThisLoading, setIsThisLoading ] = useState(true)
 
@@ -26,12 +27,12 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
       if (Result.isFailure()) {
         switch (Result.error.category) {
           case "AUTHENTICATION_FAILED":
-            handleAlertModal("AUTHENTICATION_FAILED")
+            openAlertModal("AUTHENTICATION_FAILED")
             resetAuth()
             setIsThisLoading(false)
             return
           default:
-            handleAlertModal("UNEXPECTED_ERROR")
+            openAlertModal("UNEXPECTED_ERROR")
             resetAuth()
             setIsThisLoading(false)
             return
@@ -41,7 +42,7 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
       setIsThisLoading(false)
     }
     verify()
-  },[resetAuth, setIsThisLoading, setToken, setUser])
+  },[openAlertModal, resetAuth, setIsThisLoading, setToken, setUser])
 
 
   if ( isThisLoading ) {

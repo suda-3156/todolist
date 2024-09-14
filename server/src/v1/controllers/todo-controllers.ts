@@ -1,10 +1,63 @@
 
 import { Request, Response } from "express"
 import { prisma } from "../../index"
-import { ApiErrorType, SuccessResponse, TodoResponse } from "../type"
+import { ApiErrorType, TodoList } from "../type"
+import { Prisma } from "@prisma/client"
+import { emitWarning } from "process"
 
+const getAllTodolist = async (req: Request) => {
+  return await prisma.user.findUnique({
+    where: { name: req.body.user.name },
+    select: {
+      todolist: {
+        where: {
+          author_id: req.body.user.id
+        },
+        select: {
+          todolist_title: true,
+          todolist_id: true,
+          createdAt: true,
+          updatedAt: true,
+          todoitem: {
+            where: {
+              author_id: req.body.user.id
+            },
+            select: {
+              todo_id: true,
+              todo_title: true,
+              completed: true,
+              deleted: true,
+              createdAt: true,
+              updatedAt: true,
+            }
+          }
+        }
+      }
+    }
+  })
+}
 
+type Todolists = Prisma.PromiseReturnType<typeof getAllTodolist>
 
+export const getAll = async (req: Request, res: Response) => {
+  const todolists = await getAllTodolist(req)
+
+  if ( !todolists ) {
+    const response :ApiErrorType = {
+      title: "DATABASE_ERROR",
+      message: "Couldn't get todolists from database.",
+      category: "SYSTEM_ERROR",
+      status: 500,
+    }
+    return res.status(500).json(response)
+  }
+
+  const response :{title: string, todolists: Todolists} = {
+    title: "GET_ALL_TODOLISTS",
+    todolists: todolists
+  } 
+  return res.status(200).json(response)
+}
 
 export const upsertItem = async (req: Request, res: Response) => {
   const itemId = req.body.todo.itemId

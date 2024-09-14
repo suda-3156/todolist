@@ -6,7 +6,9 @@ import { authRouter, todoRouter } from './v1/routes'
 const app :Application = express()
 const PORT = 8080
 const ClientURL = process.env.CLIENT_URL!
-export const prisma = new PrismaClient()
+export const prisma = new PrismaClient({
+  log: ["query"]
+})
 
 const options: cors.CorsOptions = {
   origin: ClientURL,

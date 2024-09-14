@@ -3,32 +3,26 @@ import { verifyToken } from "../midleware/auth-checkers/token";
 import { prisma } from "../../index"
 import { upsertItem, deleteItem } from "../controllers/todo-controllers";
 import { isTodoItem } from "../midleware/validators/todo";
-import { ApiErrorType, TodoListResponse } from "../type";
+import { ApiErrorType } from "../type";
 
 const router = Router()
 
 
 router.post("/all", verifyToken, async (req: Request, res: Response) => {
-  try {
-    const todolist_ids = await prisma.user.findUnique({
-      where : { name : req.body.user.name },
-      include: {
-        todolist: {
-          select: {
-            todolist_id: true,
-            todolist_title: true,
-            createdAt: true,
-            updatedAt: true,
-          }
-        }
-      }
-    })
-
-    const data = todolist_ids?.todolist.map(async(todolist) => {
-      await prisma.todolist.findUnique({
-        where: { todolist_id: todolist.todolist_id },
-        include: {
+  const todolists = await prisma.user.findUnique({
+    where: { name: req.body.user.name },
+    select: {
+      todolist: {
+        where: {
+          author_id: req.body.user.id
+        },
+        select: {
+          todolist_title: true,
+          todolist_id: true,
           todoitem: {
+            where: {
+              author_id: req.body.user.id
+            },
             select: {
               todo_id: true,
               todo_title: true,
@@ -39,33 +33,36 @@ router.post("/all", verifyToken, async (req: Request, res: Response) => {
             }
           }
         }
-      })
-    })
-
-    if (!data) {
-      const response :ApiErrorType = {
-        title: "DATABASE_ERROR",
-        message: "Cannot access to the database.",
-        category: "SYSTEM_ERROR",
-        status: 500,
       }
-      return res.status(500).json(response)
     }
+  })
+  // try {
 
-    const response :TodoListResponse = {
-      title: "SUCCESS",
-      todolist: data.todolist
-    }
-    return res.status(200).json(response)
-  } catch (error) {
-    const response :ApiErrorType = {
-      title: "DATABASE_ERROR",
-      message: "Cannot access to the database.",
-      category: "SYSTEM_ERROR",
-      status: 500,
-    }
-    return res.status(500).json(response)
-  }
+
+  //   if (!data) {
+  //     const response :ApiErrorType = {
+  //       title: "DATABASE_ERROR",
+  //       message: "Cannot access to the database.",
+  //       category: "SYSTEM_ERROR",
+  //       status: 500,
+  //     }
+  //     return res.status(500).json(response)
+  //   }
+
+  //   const response :TodoListResponse = {
+  //     title: "SUCCESS",
+  //     todolist: data.todolist
+  //   }
+  //   return res.status(200).json(response)
+  // } catch (error) {
+  //   const response :ApiErrorType = {
+  //     title: "DATABASE_ERROR",
+  //     message: "Cannot access to the database.",
+  //     category: "SYSTEM_ERROR",
+  //     status: 500,
+  //   }
+  //   return res.status(500).json(response)
+  // }
 })
 
 router.post("/upsertOne",

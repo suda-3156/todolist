@@ -3,18 +3,19 @@
  */
 
 import { Routes, Route } from "react-router-dom"
-// import { useAlertModalStore } from "./store"
-
 import { AnimatePresence } from "framer-motion"
 
-import { Top } from "./pages/top"
+import { AlertModal } from "./components/modules/alertModal"
+
 import { LoginForm } from "./pages/login"
 import { Signup } from "./pages/signup"
-import { AlertModal } from "./components/modules/alertModal"
+
 import { ProtectedRoute } from "./components/wapper/protected-route"
-import { Notfound } from "./pages/notfound"
 import { GlobalLayout } from "./components/template/global"
+import { Top } from "./pages/top"
 import { Todolist } from "./pages/todolist"
+
+import { Notfound } from "./pages/notfound"
 
 function App() {
   return (

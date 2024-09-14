@@ -25,26 +25,29 @@ export type ValidationApiErrorType = ApiErrorType & {
   errors?: ZodError
 }
 
-export type SuccessResponse = {
-  title: string,
+// export type TodoType = {
+//   itemId: string;
+//   title: string;
+//   completed: boolean;
+//   deleted: boolean;
+//   authorId: string;
+// }
+
+export type TodoList = {
+  todolist_id: string,
+  todolist_title: string,
+  createdAt: Date,
+  updatedAt: Date,
+  todoitems: Todoitem[]
 }
 
-export type TodoType = {
-  itemId: string;
-  title: string;
-  completed: boolean;
-  deleted: boolean;
-  authorId: string;
-}
-
-
-export type TodoResponse = SuccessResponse & {
-  todo: TodoType
-}
-
-
-export type TodoListResponse = SuccessResponse & {
-  todolist: TodoType[]
+export type Todoitem = {
+  todo_id: string,
+  todo_title: string,
+  completed: boolean,
+  deleted: boolean,
+  createdAt: Date,
+  updatedAt: Date,
 }
 
 export type Token = {
@@ -61,6 +64,10 @@ export type User = {
   }
 }
 
-export type UserTokenResponse = SuccessResponse & Token & User
+export type UserTokenResponse = {
+  title: string
+} & Token & User
 
-export type UserResponse = SuccessResponse & User
+export type UserResponse = {
+  title: string
+} & User

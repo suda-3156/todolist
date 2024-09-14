@@ -10,20 +10,38 @@ const router = Router()
 
 router.post("/all", verifyToken, async (req: Request, res: Response) => {
   try {
-    const data = await prisma.user.findUnique({
+    const todolist_ids = await prisma.user.findUnique({
       where : { name : req.body.user.name },
       include: {
-        todos: {
+        todolist: {
           select: {
-            itemId: true,
-            title: true,
-            completed: true,
-            deleted: true,
-            authorId: true
+            todolist_id: true,
+            todolist_title: true,
+            createdAt: true,
+            updatedAt: true,
           }
         }
       }
     })
+
+    const data = todolist_ids?.todolist.map(async(todolist) => {
+      await prisma.todolist.findUnique({
+        where: { todolist_id: todolist.todolist_id },
+        include: {
+          todoitem: {
+            select: {
+              todo_id: true,
+              todo_title: true,
+              completed: true,
+              deleted: true,
+              createdAt: true,
+              updatedAt: true,
+            }
+          }
+        }
+      })
+    })
+
     if (!data) {
       const response :ApiErrorType = {
         title: "DATABASE_ERROR",
@@ -33,9 +51,10 @@ router.post("/all", verifyToken, async (req: Request, res: Response) => {
       }
       return res.status(500).json(response)
     }
+
     const response :TodoListResponse = {
       title: "SUCCESS",
-      todolist: data.todos
+      todolist: data.todolist
     }
     return res.status(200).json(response)
   } catch (error) {

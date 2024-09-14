@@ -14,14 +14,16 @@ datasource db {
 }
 
 model User {
-  id          String    @id
-  email       String    @unique
-  name        String    @unique
-  password    String
-  todos       Todo[]
-  role        Role      @default(USER)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id                String    @id
+  email             String    @unique
+  name              String    @unique
+  password          String
+  role              Role      @default(USER)
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+  todolist          Todolist[]
+  todoitem          Todoitem[]
+  note              Note[]
 }
 
 enum Role {
@@ -29,11 +31,42 @@ enum Role {
   ADMIN
 }
 
-model Todo {
-  itemId      String    @id
-  title       String
-  completed   Boolean   @default(false)
-  deleted     Boolean   @default(false)
-  author      User      @relation(fields: [authorId], references: [id])
-  authorId    String
+model Todolist {
+  todolist_id     String    @id
+  todolist_title  String    @default("No title")
+  author          User      @relation(fields: [author_id], references: [id])
+  author_id       String
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  todoitem        Todoitem[]
 }
+
+model Todoitem {
+  todo_id         String    @id
+  todolist        Todolist  @relation(fields: [todolist_id], references: [todolist_id])
+  todolist_id     String
+  todo_title      String    @default("No title")
+  completed       Boolean   @default(false)
+  deleted         Boolean   @default(false)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  author          User      @relation(fields: [author_id], references: [id])  // 2個リレーションを作る意味はあるのか
+  author_id       String
+}
+
+model Note {
+  note_id         String    @id
+  note_title      String    @default("No title")
+  constent        String    
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  author          User      @relation(fields: [author_id], references: [id])
+  author_id       String
+}
+
+// schema 
+// user は todolistのidとnoteのidをあわせて配列として持つ
+// note_todolist_ids は todolistとnoteのid, そのauthorをもつ
+// todo はそれが帰属するtodolistのid, そのauthorをもつ(念の為)
+// notecontents はそれが帰属する noteのid, そのauthorを持つ
+// notecontents　は今のところ一つのnoteに対して一つだけど、今後増えるかも(ブロックごとの管理とか)

@@ -14,6 +14,7 @@ import { AlertModal } from "./components/modules/alertModal"
 import { ProtectedRoute } from "./components/wapper/protected-route"
 import { Notfound } from "./pages/notfound"
 import { GlobalLayout } from "./components/template/global"
+import { Todolist } from "./pages/todolist"
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/private" element={<ProtectedRoute redirectTo="/login" />}>
           <Route element={<GlobalLayout />}>
             <Route path="top" element={<Top />} />
+            <Route path="todolist" element={<Todolist />} />
           </Route>
         </Route>
         <Route path='*' element={<Notfound />}/>

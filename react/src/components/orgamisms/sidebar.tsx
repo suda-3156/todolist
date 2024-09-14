@@ -1,12 +1,13 @@
 
 import { motion } from "framer-motion"
-import { CircleUserRound, LogOut, SquarePen } from "lucide-react"
+import { CircleUserRound, LogOut, SquarePen, ListTodo } from "lucide-react"
 
 import { useSidebarState } from "@/store/sidebarStore"
 import { useUserStore } from "@/store/userStore"
 
-import { SidebarContents, SidebarItem, SidebarUtils } from "../wapper/sidebar"
+import { SidebarContents, SidebarUtils } from "../wapper/sidebar"
 import { SidebarOpener } from "../molcules/sidebar-opener"
+import { SidebarItem } from "../molcules/sidebar-item"
 
 
 export const Sidebar = () => {
@@ -18,7 +19,7 @@ export const Sidebar = () => {
 
   return (
     <motion.div
-      transition={{ duration: 0.3, ease: 'easeInOut' }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
       animate={{ width: isOpen ? 250 : 40 }}
       className="h-full flex bg-muted text-foreground"
     >
@@ -28,20 +29,13 @@ export const Sidebar = () => {
             <SquarePen className="hover:cursor-pointer text-primary" />
           </div>
         </SidebarUtils>
-        <SidebarItem isOpen={isOpen} className="w-full mt-4">
-          <div className="h-18 p-2 flex items-center space-x-4 hover:bg-primary/10 rounded-lg transition-all">
-            <CircleUserRound size={48} />
-            <h1 className="text-2xl font-medium hover:cursor-default">{user?.name}</h1>
-          </div>
+        <SidebarItem isOpen={isOpen} link="/private/top" className="mt-4 mb-3 h-18 space-x-4 focus-within:ring-1 focus-within:ring-ring">
+          <CircleUserRound size={48} />
+          <p className="text-2xl font-medium">{user?.name}</p>
         </SidebarItem>
-        <SidebarItem isOpen={isOpen} className="w-full h-10 flex items-center p-2 hover:bg-primary/10 rounded-lg transition-all" num={1}>
-          <p>testasdfasdfasdfasdfaasdfa</p>
-        </SidebarItem>
-        <SidebarItem isOpen={isOpen} className="w-full h-10 flex items-center p-2 hover:bg-primary/10 rounded-lg transition-all" num={2}>
-          <p>test</p>
-        </SidebarItem>
-        <SidebarItem isOpen={isOpen} className="w-full h-10 flex items-center p-2 hover:bg-primary/10 rounded-lg transition-all" num={3}>
-          <p>test</p>
+        <SidebarItem isOpen={isOpen} num={1} link="/private/todolist" >
+          <ListTodo />
+          Todo list
         </SidebarItem>
         <SidebarUtils isOpen={isOpen} className="mt-auto">
           <footer className="w-full h-10 flex items-center justify-end text-primary">

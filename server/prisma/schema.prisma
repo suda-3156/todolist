@@ -1,8 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
   provider = "prisma-client-js"
@@ -13,60 +8,53 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id                String    @id
-  email             String    @unique
-  name              String    @unique
-  password          String
-  role              Role      @default(USER)
-  createdAt         DateTime  @default(now())
-  updatedAt         DateTime  @updatedAt
-  todolist          Todolist[]
-  todoitem          Todoitem[]
-  note              Note[]
+model User_info {
+  user_id       String    @id
+  name          String    @unique
+  email         String    @unique
+  password      String
+  role          Role
+  last_login    DateTime
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  todolists     User_todolist[]
+  notes         User_note[]
 }
 
 enum Role {
   USER
   ADMIN
+  SUPER_ADMIN
 }
 
-model Todolist {
+model User_todolist {
   todolist_id     String    @id
   todolist_title  String    @default("No title")
-  author          User      @relation(fields: [author_id], references: [id])
-  author_id       String
+  style           Int       @default(0)
+  user            User_info @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict)
+  user_id         String
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  todoitem        Todoitem[]
+  todos           Todolist_todo[]
 }
 
-model Todoitem {
+model Todolist_todo {
   todo_id         String    @id
-  todolist        Todolist  @relation(fields: [todolist_id], references: [todolist_id])
-  todolist_id     String
   todo_title      String    @default("No title")
+  todolist        User_todolist @relation(fields: [todolist_id], references: [todolist_id], onDelete: Restrict, onUpdate: Restrict)
+  todolist_id     String
   completed       Boolean   @default(false)
   deleted         Boolean   @default(false)
+  style           Int       @default(0)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  author          User      @relation(fields: [author_id], references: [id])  // 2個リレーションを作る意味はあるのか
-  author_id       String
 }
 
-model Note {
+model User_note {
   note_id         String    @id
   note_title      String    @default("No title")
-  constent        String    
+  user            User_info @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict)
+  user_id         String
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  author          User      @relation(fields: [author_id], references: [id])
-  author_id       String
 }
-
-// schema 
-// user は todolistのidとnoteのidをあわせて配列として持つ
-// note_todolist_ids は todolistとnoteのid, そのauthorをもつ
-// todo はそれが帰属するtodolistのid, そのauthorをもつ(念の為)
-// notecontents はそれが帰属する noteのid, そのauthorを持つ
-// notecontents　は今のところ一つのnoteに対して一つだけど、今後増えるかも(ブロックごとの管理とか)

@@ -16,6 +16,7 @@ export const apiClient = axios.create({
 
 
 apiClient.interceptors.response.use((response) => {
+  // TODO: 200レスポンスに対しても，バリデーションを行うべきではないか
   return response
 }, (error) => {
   switch (error?.response?.data?.status) {

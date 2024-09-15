@@ -33,41 +33,41 @@ export type ValidationApiErrorType = ApiErrorType & {
 //   authorId: string;
 // }
 
-export type TodoList = {
-  todolist_id: string,
-  todolist_title: string,
-  createdAt: Date,
-  updatedAt: Date,
-  todoitems: Todoitem[]
-}
+// export type TodoList = {
+//   todolist_id: string,
+//   todolist_title: string,
+//   createdAt: Date,
+//   updatedAt: Date,
+//   todoitems: Todoitem[]
+// }
 
-export type Todoitem = {
-  todo_id: string,
-  todo_title: string,
-  completed: boolean,
-  deleted: boolean,
-  createdAt: Date,
-  updatedAt: Date,
-}
+// export type Todoitem = {
+//   todo_id: string,
+//   todo_title: string,
+//   completed: boolean,
+//   deleted: boolean,
+//   createdAt: Date,
+//   updatedAt: Date,
+// }
 
-export type Token = {
-  token: {
-    accessToken: string
-  }
-}
+// export type Token = {
+//   token: {
+//     accessToken: string
+//   }
+// }
 
-export type User = {
-  user: { 
-    name: string,
-    email: string,
-    role: $Enums.Role
-  }
-}
+// export type User = {
+//   user: { 
+//     name: string,
+//     email: string,
+//     role: $Enums.Role
+//   }
+// }
 
-export type UserTokenResponse = {
-  title: string
-} & Token & User
+// export type UserTokenResponse = {
+//   title: string
+// } & Token & User
 
-export type UserResponse = {
-  title: string
-} & User
+// export type UserResponse = {
+//   title: string
+// } & User

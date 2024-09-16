@@ -8,53 +8,71 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User_info {
-  user_id       String    @id
-  name          String    @unique
-  email         String    @unique
-  password      String
-  role          Role
+model User {
+  user_id       String    @id @db.VarChar(255)
+  role_id       Int
+  name          String    @unique @db.VarChar(255)
+  email         String    @unique @db.VarChar(255)
+  password      String    @db.VarChar(255)
   last_login    DateTime
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
-  todolists     User_todolist[]
-  notes         User_note[]
+  role          Role      @relation(fields: [role_id], references: [role_id], onUpdate: Restrict, onDelete: Restrict)
+  todolist      Todolist[]
+  note          Note[]
 }
 
-enum Role {
-  USER
-  ADMIN
-  SUPER_ADMIN
+model Role {
+  role_id       Int       @id @default(autoincrement())
+  role          String    @db.VarChar(255)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  user          User[]
 }
 
-model User_todolist {
-  todolist_id     String    @id
-  todolist_title  String    @default("No title")
-  style           Int       @default(0)
-  user            User_info @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict)
+model Style {
+  style_id      Int       @id @default(autoincrement())
+  style         String    @db.VarChar(255)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  todolist      Todolist[]
+  todo          Todo[]
+  note          Note[]
+}
+
+model Todolist {
+  todolist_id     String    @id @db.VarChar(255)
   user_id         String
+  style_id        Int
+  todolist_title  String    @default("No title")
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  todos           Todolist_todo[]
+  user            User      @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict)
+  style           Style     @relation(fields: [style_id], references: [style_id], onDelete: Restrict, onUpdate: Restrict)
+  todo            Todo[]
 }
 
-model Todolist_todo {
-  todo_id         String    @id
-  todo_title      String    @default("No title")
-  todolist        User_todolist @relation(fields: [todolist_id], references: [todolist_id], onDelete: Restrict, onUpdate: Restrict)
+model Todo {
+  todo_id         String    @id @db.VarChar(255)
   todolist_id     String
+  style_id        Int
+  todo_title      String    @default("No title") @db.VarChar(255)
   completed       Boolean   @default(false)
   deleted         Boolean   @default(false)
-  style           Int       @default(0)
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  style           Style     @relation(fields: [style_id], references: [style_id], onDelete: Restrict, onUpdate: Restrict)
+  todolist        Todolist  @relation(fields: [todolist_id], references: [todolist_id], onDelete: Restrict, onUpdate: Restrict)
 }
 
-model User_note {
-  note_id         String    @id
-  note_title      String    @default("No title")
-  user            User_info @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict)
+model Note {
+  note_id         String    @id @db.VarChar(255)
   user_id         String
+  style_id        Int
+  note_title      String    @default("No title") @db.VarChar(255)
+  content         String    @db.LongText
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
+  style           Style     @relation(fields: [style_id], references: [style_id], onDelete: Restrict, onUpdate: Restrict)
+  user            User      @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict)
 }

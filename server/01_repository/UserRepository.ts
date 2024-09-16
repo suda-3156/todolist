@@ -4,7 +4,7 @@
  *  user_id, name, email, password, last_login, roleをとる
  */
 
-import { PrismaClient } from "@prisma/client"
+import { PrismaClient, Role } from "@prisma/client"
 
 type upsertUserType = {
   user_id: string,
@@ -12,10 +12,7 @@ type upsertUserType = {
   password: string,
   email: string,
   last_login: Date,
-  role: 
-    | "USER" 
-    | "ADMIN" 
-    | "SUPER_ADMIN"
+  role: string
 }
 
 type User_details = {
@@ -24,22 +21,7 @@ type User_details = {
   email: string,
   password: string,
   last_login: Date,
-  role: 
-    | "USER" 
-    | "ADMIN" 
-    | "SUPER_ADMIN"
-}
-
-type User_abstract = {
-  user_id: string,
-  name: string,
-  last_login: Date,
-  role:
-    | "USER" 
-    | "ADMIN" 
-    | "SUPER_ADMIN"
-    // MEMO: こういうことになるから，別にroleは分けんでいい
-    | "NONE"
+  role: string
 }
 
 class UserRepositoryError extends Error {}
@@ -48,7 +30,7 @@ export interface IUserRepository {
   findById: (id: string) => Promise<User_details>
   findByName: (name: string) => Promise<User_details>
   findByEmail: (email: string) => Promise<User_details>
-  userList: () => Promise<User_abstract[]>
+  getUserList: (skip: number, take: number) => Promise<User_details[]>
   upsertUser: ({ user_id, name, password, email } : upsertUserType) => Promise<User_details>
   deleteUser: (user_id: string) => Promise<User_details>
 }
@@ -61,15 +43,16 @@ export class UserRepository implements IUserRepository {
   }
 
   findById = async (user_id: string) :Promise<User_details> => {
-    const user = await this.prisma.user_info.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { user_id: user_id }
     })
-    const role_data = await this.prisma.user_role.findUnique({
-      where: { user_id: user_id }
+    const role_data = await this.prisma.role.findUnique({
+      where: { role_id: user?.role_id }
     })
     if ( !user || !role_data ) {
       throw new UserRepositoryError
     }
+
     return {
       user_id: user_id,
       name: user.name,
@@ -81,23 +64,19 @@ export class UserRepository implements IUserRepository {
   }
 
   findByName = async (name: string) :Promise<User_details> => {
-    const user = await this.prisma.user_info.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { name: name }
     })
-    if ( !user ) {
-      throw new UserRepositoryError
-    }
-
-    const role_data = await this.prisma.user_role.findUnique({
-      where: { user_id: user.user_id }
+    const role_data = await this.prisma.role.findUnique({
+      where: { role_id: user?.role_id }
     })
-    if ( !role_data ) {
+    if ( !user || !role_data ) {
       throw new UserRepositoryError
     }
 
     return {
       user_id: user.user_id,
-      name: name,
+      name: user.name,
       email: user.email,
       password: user.password,
       last_login: user.last_login,
@@ -106,86 +85,86 @@ export class UserRepository implements IUserRepository {
   }
 
   findByEmail = async (email: string) :Promise<User_details> => {
-    const user = await this.prisma.user_info.findUnique({
+    const user = await this.prisma.user.findUnique({
       where: { email: email }
     })
-    if ( !user ) {
-      throw new UserRepositoryError
-    }
-
-    const role_data = await this.prisma.user_role.findUnique({
-      where: { user_id: user.user_id }
+    const role_data = await this.prisma.role.findUnique({
+      where: { role_id: user?.role_id }
     })
-    if ( !role_data ) {
+    if ( !user || !role_data ) {
       throw new UserRepositoryError
     }
 
     return {
       user_id: user.user_id,
       name: user.name,
-      email: email,
+      email: user.email,
       password: user.password,
       last_login: user.last_login,
       role: role_data.role
     }
   }
 
-  userList = async () :Promise<User_abstract[]> => {
-    const users_list = await this.prisma.user_info.findMany({
+  getUserList = async (skip: number, take: number) :Promise<User_details[]> => {
+    const raw_users_list = await this.prisma.user.findMany({
+      skip: skip,
+      take: take,
       select: {
         user_id: true,
         name: true,
+        password: true,
+        email: true,
         last_login: true,
+        role: {
+          select: {
+            role: true
+          }
+        }
       }
     })
 
-    
-    const res_list = await Promise.all(users_list.map( async (user) => {
-      const user_role = await this.prisma.user_role.findUnique({
-        where: { user_id: user.user_id }
-      })
-      if ( !user_role ) {
-        throw new UserRepositoryError
-      }
+    const users_list = raw_users_list.map((user) => {
       return {
         user_id: user.user_id,
         name: user.name,
+        email: user.email,
+        password: user.password,
         last_login: user.last_login,
-        role: user_role.role
+        role: user.role.role
       }
-    }))
-
-    return res_list
+    })
+    
+    return users_list
   }
 
   upsertUser = async ({ user_id, name, password, email, last_login, role }: upsertUserType): Promise<User_details> => {
-    const user = await this.prisma.user_info.upsert({
+    const role_data = await this.prisma.role.findFirst({
+      where: { role: role }
+    })
+
+    if ( !role_data ) {
+      throw new UserRepositoryError
+    }
+
+    const user = await this.prisma.user.upsert({
       where: { user_id: user_id },
       create: {
         user_id: user_id,
         name: name,
-        password: password,
         email: email,
+        password: password,
         last_login: last_login,
+        role_id: role_data.role_id
       },
       update: {
         name: name,
+        email: email,
         password: password,
-        email: email
+        last_login: last_login,
+        role_id: role_data.role_id
       }
     })
-
-    const role_data = await this.prisma.user_role.upsert({
-      where: { user_id: user.user_id },
-      create: {
-        user_id: user.user_id,
-        role: role
-      },
-      update: {
-        role: role,
-      }
-    })
-
+    
     return {
       user_id: user.user_id,
       name: user.name,
@@ -197,11 +176,23 @@ export class UserRepository implements IUserRepository {
   }
 
   deleteUser = async (user_id: string) :Promise<User_details> => {
-    const user = await this.prisma.user_info.delete({
+    const user = await this.prisma.user.findUnique({
       where: { user_id: user_id }
     })
 
-    const role_data = await this.prisma.user_role.delete({
+    if ( !user ) {
+      throw new UserRepositoryError
+    }
+
+    const role_data = await this.prisma.role.findFirst({
+      where: { role_id: user.role_id }
+    })
+
+    if ( !role_data ) {
+      throw new UserRepositoryError
+    }
+
+    await this.prisma.user.delete({
       where: { user_id: user_id }
     })
 

@@ -31,11 +31,26 @@ TZ=Asia/Tokyo
 
 ### 初回起動
 
+`docker network create todolist`でネットワークを作成する
+
 `docker compose up --build -d`を実行する
 
-`docker compose exec server bash`のち，`npm run dev`
+prismaあたりで
 
-`docker compose exec app bash`のち，`npm run dev`
+```
+# mysql -u root -p 
+GRANT CREATE, DROP ON *.* TO 'user'@'%';
+FLUSH PRIVILEGES;
+# docker compose exec server bash
+npx prisma generate
+npx prisma db push
+```
+
+あたりが必要になると思うけど，今改装中なのでわかんないです．
+
+`docker compose exec server bash`のち，`npm ci`, `npm run dev`
+
+`docker compose exec app bash`のち，`npm ci`, `npm run dev`
 
 で起動できます．
 

@@ -27,8 +27,44 @@ TZ=Asia/Tokyo
 
 * node.jsの設定
 
-とくになし．
+とくになしです．
 
 ### 初回起動
 
 `docker compose up --build -d`を実行する
+
+`docker compose exec server bash`のち，`npm run dev`
+
+`docker compose exec app bash`のち，`npm run dev`
+
+で起動できます．
+
+* 落とし方
+
+`docker compose stop`でコンテナを止められて，`docker compose down`でコンテナを停止&削除．imageとvolumeは残っています．
+
+* 2回目以降の起動
+
+imageが残ってると思うので，`docker compose up -d`でいいはずです．
+
+## 意識したこと
+
+### Mysql
+
+ほぼネット上の奴をコピペ．ルートユーザーで開発するのはよくないと聞いたので，そうしてます．
+
+### React
+
+後で作り直す時がするから，あとでかく．
+
+### Server
+
+レイヤードアーキテクチャってやつ．採用理由は最初に知ったアーキテクチャなので．あと，本に困ったらこれみたいにかいてありました．
+
+Detabaseアクセス層はprismaがあるので，ないです．
+
+Repository層でDetabaseのテーブルの生のデータを使いやすい形に変換してます．
+
+Usecase層で必要であればロジックを書くつもりです．
+
+Controllerで認証，認可処理，バリデーション，レスポンスをするつもりです．index.tsかapp.tsで依存性注入をするかも？？？

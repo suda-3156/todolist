@@ -31,3 +31,4 @@ TZ=Asia/Tokyo
 
 ### 初回起動
 
+`docker compose up --build -d`を実行する

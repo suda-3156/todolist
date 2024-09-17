@@ -18,10 +18,10 @@ touch mysql-error.log mysql-query.log mysql-slow.log
 ルートディレクトリで`touch .env`したのち，以下を書き入れる．
 
 ```
-ROOT_PASSWORD=パスワード
-DB_NAME=データベース名
-DB_USER=開発で使うユーザー
-DB_PASS=開発で使うユーザーのパスワード
+ROOT_PASSWORD=test #パスワード
+DB_NAME=test  #データベース名
+DB_USER=test #開発で使うユーザー
+DB_PASS=test #開発で使うユーザーのパスワード
 TZ=Asia/Tokyo
 ```
 

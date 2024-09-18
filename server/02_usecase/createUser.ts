@@ -28,11 +28,11 @@ type NewUser = {
   role: string
 }
 
-export interface IUserService {
-  signUp: (newUser: NewUser) => void
+export interface ICreateUserUseCase {
+  execute: (newUser: NewUser) => void
 }
 
-export class UserService implements IUserService {
+export class CreateUserUseCase implements ICreateUserUseCase {
   private UR: IUserRepository
   private RR: IRoleRepository
 
@@ -41,7 +41,7 @@ export class UserService implements IUserService {
     this.RR = RoleRepository
   }
 
-  signUp = async (newUser: NewUser) => {
+  execute = async (newUser: NewUser) => {
     // roleの確認
     try {
       const role_exists = await this.RR.findByRole(newUser.role)

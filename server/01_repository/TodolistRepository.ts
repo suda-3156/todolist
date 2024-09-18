@@ -1,118 +1,118 @@
 /**
  * TodolistRepository
- * @param user_id
- * @returns todolist
+ *  user_id
+ *  todolist
  *  todolist_id, todolit_title, 
  */
 
-import { PrismaClient } from "@prisma/client"
+// import { PrismaClient } from "@prisma/client"
 
 
 
-type Todolist_attrs = {
-  todolist_id: string,
-  todolist_title: string,
-  style: string,
-  user_id: string,
-  updatedAt: Date,
-}
+// type Todolist_attrs = {
+//   todolist_id: string,
+//   todolist_title: string,
+//   style: string,
+//   user_id: string,
+//   updatedAt: Date,
+// }
 
-type Todo = {
-  todo_id: string,
-  todo_title: string,
-  completed: boolean,
-  deleted: boolean,
-  style: number,
-  updatedAt: Date
-}
+// type Todo = {
+//   todo_id: string,
+//   todo_title: string,
+//   completed: boolean,
+//   deleted: boolean,
+//   style: number,
+//   updatedAt: Date
+// }
 
-type Todolist = {
-  header: Todolist_attrs,
-  todos: Todo[]
-}
+// type Todolist = {
+//   header: Todolist_attrs,
+//   todos: Todo[]
+// }
 
 
-class TodolistRepositoryError extends Error {}
+// class TodolistRepositoryError extends Error {}
 
-export interface ITodolistRepository {
-  // user_idでtodolist_attrs_listを返す
-  findByUserId: (user_id: string, skip:number, take: number) => Promise<Todolist_attrs[]> 
-  // todolist_idでtodolist_attrsとtodosを指定されたoffset, lengthで見つける
-  getTolist: (todolist_id: string, skip: number, take: number) => Promise<Todo[]>
-  // todo_idでtodoを見つける
-  findByTodoId: (todo_id: string) => Promise<Todo>
+// export interface ITodolistRepository {
+//   // user_idでtodolist_attrs_listを返す
+//   findByUserId: (user_id: string, skip:number, take: number) => Promise<Todolist_attrs[]> 
+//   // todolist_idでtodolist_attrsとtodosを指定されたoffset, lengthで見つける
+//   getTolist: (todolist_id: string, skip: number, take: number) => Promise<Todo[]>
+//   // todo_idでtodoを見つける
+//   findByTodoId: (todo_id: string) => Promise<Todo>
 
-  // todolist_idでtodolist_attrsをupsertする
-  upsertTodolist: (todolist: Todolist_attrs) => Promise<Todolist_attrs>
-  // todolist_idでdeleteする(付随するtodosも)
-  deleteTodolist: (todolist_id: string) => Promise<Todolist_attrs>
+//   // todolist_idでtodolist_attrsをupsertする
+//   upsertTodolist: (todolist: Todolist_attrs) => Promise<Todolist_attrs>
+//   // todolist_idでdeleteする(付随するtodosも)
+//   deleteTodolist: (todolist_id: string) => Promise<Todolist_attrs>
   
-  // todo_idでupsertする
-  upsertTodo: (todo: Todo) => Promise<Todo>
-  // todo_idでdeleteする
-  deleteTodo: (todo_id: string) => Promise<Todo>
-}
+//   // todo_idでupsertする
+//   upsertTodo: (todo: Todo) => Promise<Todo>
+//   // todo_idでdeleteする
+//   deleteTodo: (todo_id: string) => Promise<Todo>
+// }
 
-export class TodolistRepository implements ITodolistRepository {
-  private prisma: PrismaClient
+// export class TodolistRepository implements ITodolistRepository {
+//   private prisma: PrismaClient
 
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma
-  }
+//   constructor(prisma: PrismaClient) {
+//     this.prisma = prisma
+//   }
 
-  findByUserId = async (user_id: string, skip:number, take: number) :Promise<Todolist_attrs[]> => {
-    const raw_todolist_attrs_list = await this.prisma.user.findUnique({
-      where: { user_id: user_id },
-      select: {
-        todolist: {
-          select: {
-            todolist_id: true,
-            todolist_title: true,
-            style: true,
-            updatedAt: true,
-          },
-          orderBy: {
-            updatedAt: 'desc'
-          }
-        }
-      }
-    })
+//   findByUserId = async (user_id: string, skip:number, take: number) :Promise<Todolist_attrs[]> => {
+//     const raw_todolist_attrs_list = await this.prisma.user.findUnique({
+//       where: { user_id: user_id },
+//       select: {
+//         todolist: {
+//           select: {
+//             todolist_id: true,
+//             todolist_title: true,
+//             style: true,
+//             updatedAt: true,
+//           },
+//           orderBy: {
+//             updatedAt: 'desc'
+//           }
+//         }
+//       }
+//     })
 
-    if ( !raw_todolist_attrs_list ) {
-      throw new TodolistRepositoryError
-    }
+//     if ( !raw_todolist_attrs_list ) {
+//       throw new TodolistRepositoryError
+//     }
     
-    const todolist_attrs_list = raw_todolist_attrs_list.todolist.map((raw_todolist_attrs) => {
-      return {
-        todolist_id: raw_todolist_attrs.todolist_id,
-        todolist_title: raw_todolist_attrs.todolist_title,
-        style: raw_todolist_attrs.style.style,
-        user_id: user_id,
-        updatedAt: raw_todolist_attrs.updatedAt
-      }
-    })
+//     const todolist_attrs_list = raw_todolist_attrs_list.todolist.map((raw_todolist_attrs) => {
+//       return {
+//         todolist_id: raw_todolist_attrs.todolist_id,
+//         todolist_title: raw_todolist_attrs.todolist_title,
+//         style: raw_todolist_attrs.style.style,
+//         user_id: user_id,
+//         updatedAt: raw_todolist_attrs.updatedAt
+//       }
+//     })
 
-    return todolist_attrs_list
-  }
+//     return todolist_attrs_list
+//   }
 
-  getTodolist = async (todolist_id: string, skip: number, take: number ) :Promise<Todolist_attrs> => {
-    const todolist_attrs = await this.prisma.user_todolist.findUnique({
-      where: { todolist_id: todolist_id },
-      select: {
-        todolist_id: true,
-        todolist_title: true,
-        style: true,
-        user_id: true,
-        updatedAt: true,
-      }
-    })
+//   getTodolist = async (todolist_id: string, skip: number, take: number ) :Promise<Todolist_attrs> => {
+//     const todolist_attrs = await this.prisma.user_todolist.findUnique({
+//       where: { todolist_id: todolist_id },
+//       select: {
+//         todolist_id: true,
+//         todolist_title: true,
+//         style: true,
+//         user_id: true,
+//         updatedAt: true,
+//       }
+//     })
 
-    if ( !todolist_attrs ) {
-      throw new TodolistRepositoryError
-    }
+//     if ( !todolist_attrs ) {
+//       throw new TodolistRepositoryError
+//     }
 
-    return todolist_attrs
-  }
+//     return todolist_attrs
+//   }
 
   // getTodos = async (todolist_id: string, skip: number, take: number) :Promise<Todo[]> => {
   //   const todo_ids = await this.prisma.todolist_todo.findMany({
@@ -228,6 +228,6 @@ export class TodolistRepository implements ITodolistRepository {
   // upsertTodo: (todo: Todo) => Promise<Todo>
   // // todo_idでdeleteする
   // deleteTodo: (todo_id: string) => Promise<Todo>
-}
+// }
 
 //TODO: db初期化する

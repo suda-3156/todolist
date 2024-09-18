@@ -31,8 +31,10 @@ export const AlertModal = () => {
 
   const navigate = useNavigate()
 
+  const settings = getSettings()
+
   const onClickOk = () => {
-    const url = getSettings().url
+    const url = settings.url
     if ( url !== ""){
       navigate(url)
     }
@@ -43,15 +45,15 @@ export const AlertModal = () => {
     <AnimatedDiv className="fixed top-0 z-[-10] left-0 w-screen h-screen flex justify-center items-center">
       <AlertDialog open={isOpen}>
         <AlertDialogPortal>
-          <AlertDialogOverlay onClick={getSettings().isCancenable ? closeAlertModal : undefined }/>
+          <AlertDialogOverlay onClick={settings.isCancenable ? closeAlertModal : undefined }/>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-2xl">{getSettings().title}</AlertDialogTitle>
-              <AlertDialogDescription>{getSettings().message}</AlertDialogDescription>
+              <AlertDialogTitle className="text-2xl">{settings.title}</AlertDialogTitle>
+              <AlertDialogDescription>{settings.message}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               {
-                getSettings().isCancenable && 
+                settings.isCancenable && 
                 <AlertDialogCancel onClick={closeAlertModal}>Cancel</AlertDialogCancel>
               }
               <AlertDialogAction onClick={onClickOk} className="text-background font-semibold">Continue</AlertDialogAction>

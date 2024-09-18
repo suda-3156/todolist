@@ -4,7 +4,7 @@
  *  user_id, name, email, password, last_login, roleをとる
  */
 
-import { PrismaClient, Role } from "@prisma/client"
+import { PrismaClient } from "@prisma/client"
 
 type upsertUserType = {
   user_id: string,

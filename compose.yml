@@ -26,7 +26,7 @@ services:
       - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./server:/src
-    command: ["npm", "ci"]
+    # command: ["npm", "ci"]
     ports:
       - '8080:8080'
       - '5555:5555'
@@ -40,7 +40,7 @@ services:
     tty: true
     volumes:
       - ./react:/src
-    command: ["npm", "ci"]
+    # command: ["npm", "ci"]
     ports:
       - '5173:5173'
     depends_on:

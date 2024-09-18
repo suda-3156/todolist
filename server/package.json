@@ -5,8 +5,7 @@
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec node -r ts-node/register --env-file=.env ./src/index.ts",
-    "postinstall": "cp .env.example .env"
+    "dev": "nodemon --exec node -r ts-node/register --env-file=.env ./src/index.ts"
   },
   "author": "suda",
   "license": "MIT",

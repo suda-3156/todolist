@@ -6,22 +6,14 @@
  */
 
 import { randomUUID } from "crypto";
-import { IUserRepository } from "../01_repository/UserRepository";
-import { IRoleRepository, RoleRepositoryError } from "../01_repository/RoleRepository";
+import { IUserRepository, User_details } from "../01_repository/UserRepository";
+// import { IRoleRepository } from "../01_repository/RoleRepository";
+import { UseCaseError } from "./UseCaseError";
+import { DBAccessError } from "../01_repository/RepositoryError";
 
-// export class UserServiceError extends Error {
-//   cause: string
-//   detail: string
+export class CreateUserUseCaseError extends UseCaseError {}
 
-//   constructor( cause: string, detail: string ) {
-//     super()
-//     this.cause = cause
-//     this.detail = detail
-//   }
-
-// }
-
-type NewUser = {
+export type NewUser = {
   name: string,
   email: string,
   password: string,
@@ -29,42 +21,57 @@ type NewUser = {
 }
 
 export interface ICreateUserUseCase {
-  execute: (newUser: NewUser) => void
+  execute: (newUser: NewUser) => Promise<User_details | CreateUserUseCaseError>
 }
 
 export class CreateUserUseCase implements ICreateUserUseCase {
   private UR: IUserRepository
-  private RR: IRoleRepository
+  // private RR: IRoleRepository
 
-  constructor(UserRepository: IUserRepository, RoleRepository: IRoleRepository) {
+  constructor(UserRepository: IUserRepository/* , RoleRepository: IRoleRepository */) {
     this.UR = UserRepository
-    this.RR = RoleRepository
+    // this.RR = RoleRepository
   }
 
-  execute = async (newUser: NewUser) => {
+  execute = async (newUser: NewUser) :Promise<User_details | CreateUserUseCaseError> => {
     // roleの確認
-    try {
-      const role_exists = await this.RR.findByRole(newUser.role)
-    } catch (error) {
-      if ( error instanceof RoleRepositoryError) {
-        throw new 
-      }
+    // await this.RR.findByRole(newUser.role)
+    //   .catch((error) => {
+    //     if (error instanceof DBAccessError) {
+    //       throw new CreateUserUseCaseError("DB_ACCESS_ERROR")
+    //     }
+    //     throw new CreateUserUseCaseError("DB_NOT_FOUND", "role not found")
+    //   })
+
+    const nameExists = await this.UR.findByName(newUser.name)
+    if ( nameExists ) {
+      return new CreateUserUseCaseError("VALIDATION_ERROR", "This username is already used.")
+    }
+    
+    const emailExists = await this.UR.findByName(newUser.email)
+    if ( emailExists ) {
+      return new CreateUserUseCaseError("VALIDATION_ERROR", "This email is already used.")
     }
 
-
     const newId = randomUUID().toString()
-    const last_login = new Date().toString()
-
-
-    this.UR.upsertUser({
-      id: newId,
+    const last_login = new Date()
+    
+    // roleの存在確認はどうせ中でやる
+    const userRes = await this.UR.upsertUser({
+      user_id: newId,
       name: newUser.name,
       email: newUser.email,
       password: newUser.password,
-      role: newUser.role
+      role: newUser.role,
+      last_login: last_login
+    })
+    .catch((error) => {
+      if (error instanceof DBAccessError) {
+        return new CreateUserUseCaseError("DB_ACCESS_ERROR")
+      }
+      return new CreateUserUseCaseError("DB_NOT_FOUND", "role not found")
     })
 
+    return userRes
   }
-  
-
 }

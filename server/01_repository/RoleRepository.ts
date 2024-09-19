@@ -1,6 +1,7 @@
 
 
 import { PrismaClient, Role } from "@prisma/client"
+import { DBAccessError } from "./RepositoryError"
 
 type Role_details = {
   role_id: number,
@@ -20,7 +21,6 @@ export interface IRoleRepository {
   deleteRole: (role_id: number) => Promise<Role_details>
 }
 
-// MEMO: roleを@uniqueに変更，DB新しくする sql書き換えてreset???
 export class RoleRepository implements IRoleRepository {
   private prisma: PrismaClient
 
@@ -36,6 +36,9 @@ export class RoleRepository implements IRoleRepository {
         role: true,
         updatedAt: true
       }
+    })
+    .catch(() => {
+      throw new DBAccessError
     })
 
     if ( !role ) {
@@ -54,11 +57,13 @@ export class RoleRepository implements IRoleRepository {
         updatedAt: true
       }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
 
     if ( !role_data ) {
       throw new RoleRepositoryError
     }
-
     return role_data
   }
 
@@ -69,6 +74,9 @@ export class RoleRepository implements IRoleRepository {
         role: true,
         updatedAt: true
       }
+    })
+    .catch(() => {
+      throw new DBAccessError
     })
 
     if ( !raw_role_list ) {
@@ -89,6 +97,9 @@ export class RoleRepository implements IRoleRepository {
         updatedAt: true
       }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
 
     return role_data
   }
@@ -105,6 +116,9 @@ export class RoleRepository implements IRoleRepository {
         updatedAt: true
       }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
 
     return role_data
   }
@@ -112,6 +126,9 @@ export class RoleRepository implements IRoleRepository {
   deleteRole = async (role_id: number) :Promise<Role_details> => {
     const role_data = await this.prisma.role.delete({
       where: { role_id: role_id }
+    })
+    .catch(() => {
+      throw new DBAccessError
     })
     
     return role_data

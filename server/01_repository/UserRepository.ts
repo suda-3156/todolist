@@ -5,8 +5,9 @@
  */
 
 import { PrismaClient } from "@prisma/client"
+import { DBAccessError } from "./RepositoryError"
 
-type upsertUserType = {
+export type upsertUserType = {
   user_id: string,
   name: string,
   password: string,
@@ -15,7 +16,7 @@ type upsertUserType = {
   role: string
 }
 
-type User_details = {
+export type User_details = {
   user_id: string,
   name: string,
   email: string,
@@ -46,18 +47,30 @@ export class UserRepository implements IUserRepository {
     const user = await this.prisma.user.findUnique({
       where: { user_id: user_id }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
+
     const role_data = await this.prisma.role.findUnique({
       where: { role_id: user?.role_id }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
+
     if ( !user || !role_data ) {
       throw new UserRepositoryError
     }
 
+    // decode
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    
     return {
       user_id: user_id,
       name: user.name,
-      email: user.email,
-      password: user.password,
+      email: decodedEmail,
+      password: decodedPassword,
       last_login: user.last_login,
       role: role_data.role
     }
@@ -67,39 +80,70 @@ export class UserRepository implements IUserRepository {
     const user = await this.prisma.user.findUnique({
       where: { name: name }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
+
+    if ( !user ) {
+      throw new UserRepositoryError
+    }
+    
+
     const role_data = await this.prisma.role.findUnique({
       where: { role_id: user?.role_id }
     })
-    if ( !user || !role_data ) {
+    .catch(() => {
+      throw new DBAccessError
+    })
+
+    if ( !role_data ) {
       throw new UserRepositoryError
     }
+
+    // decode
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
 
     return {
       user_id: user.user_id,
       name: user.name,
-      email: user.email,
-      password: user.password,
+      email: decodedEmail,
+      password: decodedPassword,
       last_login: user.last_login,
       role: role_data.role
     }
   }
 
   findByEmail = async (email: string) :Promise<User_details> => {
+    // encode
+    const encodedEmail = CryptoJS.AES.encrypt(email, process.env.SECRET_KEY!).toString()
+    
     const user = await this.prisma.user.findUnique({
-      where: { email: email }
+      where: { email: encodedEmail }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
+
     const role_data = await this.prisma.role.findUnique({
       where: { role_id: user?.role_id }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
+
     if ( !user || !role_data ) {
       throw new UserRepositoryError
     }
 
+    // decode
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+
     return {
       user_id: user.user_id,
       name: user.name,
-      email: user.email,
-      password: user.password,
+      email: email,
+      password: decodedPassword,
       last_login: user.last_login,
       role: role_data.role
     }
@@ -122,13 +166,20 @@ export class UserRepository implements IUserRepository {
         }
       }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
 
+    
     const users_list = raw_users_list.map((user) => {
+      //decode 
+      const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+      const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
       return {
         user_id: user.user_id,
         name: user.name,
-        email: user.email,
-        password: user.password,
+        email: decodedEmail,
+        password: decodedPassword,
         last_login: user.last_login,
         role: user.role.role
       }
@@ -138,38 +189,54 @@ export class UserRepository implements IUserRepository {
   }
 
   upsertUser = async ({ user_id, name, password, email, last_login, role }: upsertUserType): Promise<User_details> => {
+    // encode
+    const encodedEmail = CryptoJS.AES.encrypt(email, process.env.SECRET_KEY!).toString()
+    const encodedPassword = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY!).toString()
+
     const role_data = await this.prisma.role.findFirst({
       where: { role: role }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
 
+    
     if ( !role_data ) {
       throw new UserRepositoryError
     }
-
+    
     const user = await this.prisma.user.upsert({
       where: { user_id: user_id },
       create: {
         user_id: user_id,
         name: name,
-        email: email,
-        password: password,
+        email: encodedEmail,
+        password: encodedPassword,
         last_login: last_login,
         role_id: role_data.role_id
       },
       update: {
         name: name,
-        email: email,
-        password: password,
+        email: encodedEmail,
+        password: encodedPassword,
         last_login: last_login,
         role_id: role_data.role_id
       }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
+
+    // decode
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+
     
     return {
       user_id: user.user_id,
       name: user.name,
-      email: user.email,
-      password: user.password,
+      email: decodedEmail,
+      password: decodedPassword,
       last_login: user.last_login,
       role: role_data.role
     }
@@ -179,6 +246,9 @@ export class UserRepository implements IUserRepository {
     const user = await this.prisma.user.findUnique({
       where: { user_id: user_id }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
 
     if ( !user ) {
       throw new UserRepositoryError
@@ -186,6 +256,9 @@ export class UserRepository implements IUserRepository {
 
     const role_data = await this.prisma.role.findFirst({
       where: { role_id: user.role_id }
+    })
+    .catch(() => {
+      throw new DBAccessError
     })
 
     if ( !role_data ) {
@@ -195,12 +268,20 @@ export class UserRepository implements IUserRepository {
     await this.prisma.user.delete({
       where: { user_id: user_id }
     })
+    .catch(() => {
+      throw new DBAccessError
+    })
+
+    // decode
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    
 
     return {
       user_id: user.user_id,
       name: user.name,
-      email: user.email,
-      password: user.password,
+      email: decodedEmail,
+      password: decodedPassword,
       last_login: user.last_login,
       role: role_data.role
     }

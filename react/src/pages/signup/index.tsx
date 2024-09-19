@@ -36,7 +36,7 @@ export const Signup = () =>  {
   const openAlertModal = useAlertModalStore((state) => state.openAlertModal)
 
   const onSubmit = async (data: SignupFormInputSchema) => {
-    const Result = await SignUpAPI(data)
+    const Result = await SignUpAPI({...data, role: "USER"})
     // 異常系
     if (Result.isFailure()) {
       switch (Result.error.category) {

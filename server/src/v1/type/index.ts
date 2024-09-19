@@ -4,7 +4,7 @@ import { ZodError } from "zod"
 
 
 type ApiErrorCategory = 
-  | "BAD_REQUEST"           //bad request 400
+  | "BAD_REQUEST"           //bad request, parameter error 400
   | "UNAUTHORIZED"          //認証エラー 401
   | "AUTHENTICATION_FAILED" //権限なし 403
   | "NOT_FOUND"             //not found 404

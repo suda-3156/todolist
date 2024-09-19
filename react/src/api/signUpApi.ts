@@ -11,7 +11,8 @@ import { ApiResult, Failure, Success } from "./type"
 export type SignUpAPIRequest = {
   name: string,
   email: string,
-  password: string
+  password: string,
+  role: string
 }
 
 export type SignUpAPIResponse = {
@@ -20,10 +21,10 @@ export type SignUpAPIResponse = {
   token: TokenType
 }
 
-export const SignUpAPI = async ({ name, email, password } :SignUpAPIRequest) 
+export const SignUpAPI = async ({ name, email, password, role } :SignUpAPIRequest) 
   :Promise<ApiResult<SignUpAPIResponse, ApiError | ValidationApiError >> => {
   try {
-    const value = await apiClient.post<SignUpAPIResponse>("/auth/register", {user: { name, email, password }})
+    const value = await apiClient.post<SignUpAPIResponse>("/auth/register", {user: { name, email, password, role }})
     return new Success<SignUpAPIResponse>(value.data)
   } catch (error) {
     if ( error instanceof ApiError) {

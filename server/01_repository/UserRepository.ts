@@ -5,7 +5,7 @@
  */
 
 import { PrismaClient } from "@prisma/client"
-import { DBAccessError } from "./RepositoryError"
+import { RepositoryError, Result } from "./RepositoryError"
 
 export type upsertUserType = {
   user_id: string,
@@ -25,11 +25,10 @@ export type User_details = {
   role: string
 }
 
-class UserRepositoryError extends Error {}
-
 export interface IUserRepository {
-  findById: (id: string) => Promise<User_details>
-  findByName: (name: string) => Promise<User_details>
+  // findById: (id: string) => Promise<User_details | RepositoryError>
+  findById: (id: string) => Promise<Result<User_details | RepositoryError>>
+  findByName: (name: string) => Promise<User_details | RepositoryError>
   findByEmail: (email: string) => Promise<User_details>
   getUserList: (skip: number, take: number) => Promise<User_details[]>
   upsertUser: ({ user_id, name, password, email } : upsertUserType) => Promise<User_details>
@@ -43,23 +42,51 @@ export class UserRepository implements IUserRepository {
     this.prisma = prisma
   }
 
-  findById = async (user_id: string) :Promise<User_details> => {
+  // findById = async (user_id: string) :Promise<User_details | RepositoryError> => {
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { user_id: user_id }
+  //   })
+
+  //   if ( !user ) {
+  //     throw new RepositoryError("RECORD_NOT_FOUND")
+  //   }
+
+  //   const role_data = await this.prisma.role.findUnique({
+  //     where: { role_id: user?.role_id }
+  //   })
+
+  //   if ( !role_data ) {
+  //     throw new RepositoryError("RECORD_NOT_FOUND")
+  //   }
+
+  //   // decode
+  //   const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+  //   const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    
+  //   return {
+  //     user_id: user_id,
+  //     name: user.name,
+  //     email: decodedEmail,
+  //     password: decodedPassword,
+  //     last_login: user.last_login,
+  //     role: role_data.role
+  //   }
+  // }
+  findById = async (user_id: string) :Promise<Result<User_details | RepositoryError>> => {
     const user = await this.prisma.user.findUnique({
       where: { user_id: user_id }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
+
+    if ( !user ) {
+      throw new RepositoryError("RECORD_NOT_FOUND")
+    }
 
     const role_data = await this.prisma.role.findUnique({
       where: { role_id: user?.role_id }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
 
-    if ( !user || !role_data ) {
-      throw new UserRepositoryError
+    if ( !role_data ) {
+      throw new RepositoryError("RECORD_NOT_FOUND")
     }
 
     // decode
@@ -76,28 +103,22 @@ export class UserRepository implements IUserRepository {
     }
   }
 
-  findByName = async (name: string) :Promise<User_details> => {
+  findByName = async (name: string) :Promise<User_details | RepositoryError> => {
     const user = await this.prisma.user.findUnique({
       where: { name: name }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
 
     if ( !user ) {
-      throw new UserRepositoryError
+      throw new RepositoryError("RECORD_NOT_FOUND")
     }
     
 
     const role_data = await this.prisma.role.findUnique({
       where: { role_id: user?.role_id }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
 
     if ( !role_data ) {
-      throw new UserRepositoryError
+      throw new RepositoryError("RECORD_NOT_FOUND")
     }
 
     // decode
@@ -121,19 +142,16 @@ export class UserRepository implements IUserRepository {
     const user = await this.prisma.user.findUnique({
       where: { email: encodedEmail }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
+    if ( !user ) {
+      throw new RepositoryError("RECORD_NOT_FOUND")
+    }
 
     const role_data = await this.prisma.role.findUnique({
       where: { role_id: user?.role_id }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
 
-    if ( !user || !role_data ) {
-      throw new UserRepositoryError
+    if ( !role_data ) {
+      throw new RepositoryError("RECORD_NOT_FOUND")
     }
 
     // decode
@@ -166,10 +184,6 @@ export class UserRepository implements IUserRepository {
         }
       }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
-
     
     const users_list = raw_users_list.map((user) => {
       //decode 
@@ -196,13 +210,8 @@ export class UserRepository implements IUserRepository {
     const role_data = await this.prisma.role.findFirst({
       where: { role: role }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
-
-    
     if ( !role_data ) {
-      throw new UserRepositoryError
+      throw new RepositoryError("RECORD_NOT_FOUND")
     }
     
     const user = await this.prisma.user.upsert({
@@ -222,9 +231,6 @@ export class UserRepository implements IUserRepository {
         last_login: last_login,
         role_id: role_data.role_id
       }
-    })
-    .catch(() => {
-      throw new DBAccessError
     })
 
     // decode
@@ -246,30 +252,21 @@ export class UserRepository implements IUserRepository {
     const user = await this.prisma.user.findUnique({
       where: { user_id: user_id }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
 
     if ( !user ) {
-      throw new UserRepositoryError
+      throw new RepositoryError("RECORD_NOT_FOUND")
     }
 
     const role_data = await this.prisma.role.findFirst({
       where: { role_id: user.role_id }
     })
-    .catch(() => {
-      throw new DBAccessError
-    })
 
-    if ( !role_data ) {
-      throw new UserRepositoryError
+    if ( !role_data) {
+      throw new RepositoryError("RECORD_NOT_FOUND")
     }
 
     await this.prisma.user.delete({
       where: { user_id: user_id }
-    })
-    .catch(() => {
-      throw new DBAccessError
     })
 
     // decode

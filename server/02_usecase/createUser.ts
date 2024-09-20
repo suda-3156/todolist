@@ -9,7 +9,7 @@ import { randomUUID } from "crypto";
 import { IUserRepository, User_details } from "../01_repository/UserRepository";
 // import { IRoleRepository } from "../01_repository/RoleRepository";
 import { UseCaseError } from "./UseCaseError";
-import { DBAccessError } from "../01_repository/RepositoryError";
+import { DBAccessError, RepositoryError } from "../01_repository/RepositoryError";
 
 export class CreateUserUseCaseError extends UseCaseError {}
 

@@ -13,21 +13,9 @@ touch mysql-error.log mysql-query.log mysql-slow.log
 
 を実行する．
 
-* compose.ymlの設定
+* .envの設定
 
-ルートディレクトリで`touch .env`したのち，以下を書き入れる．
-
-```
-ROOT_PASSWORD=test #パスワード
-DB_NAME=test  #データベース名
-DB_USER=test #開発で使うユーザー
-DB_PASS=test #開発で使うユーザーのパスワード
-TZ=Asia/Tokyo
-```
-
-* node.jsの設定
-
-とくになしです．
+`.env.example`を`.env`に変更する
 
 ### 初回起動
 
@@ -35,20 +23,35 @@ TZ=Asia/Tokyo
 
 `docker compose up --build -d`を実行する
 
-prismaあたりで
+* データベースの設定
+
+以下を一行ずつ実行していく
 
 ```
-# mysql -u root -p 
+docker compose exec server bash
+npm ci
+npx prisma migrate deploy
+npx prisma generate #必要かわからないけど、一応
+exit
+```
+
+- * 権限に関するエラーが出たら、
+
+```
+docker compose exec db bash
+mysql -u root -p
+# ルートユーザーのパスワードを入力
 GRANT CREATE, DROP ON *.* TO 'user'@'%';
 FLUSH PRIVILEGES;
-# docker compose exec server bash
-npx prisma generate
-npx prisma db push
 ```
 
-あたりが必要になると思うけど，今改装中なのでわかんないです．
+をすればいいはずです。
 
-`docker compose exec server bash`のち，`npm ci`, `npm run dev`
+**Roleの設定と、ADMINユーザーの設定は後で書くつもり。**
+
+あとは、
+
+`docker compose exec server bash`のち， `npm run dev`
 
 `docker compose exec app bash`のち，`npm ci`, `npm run dev`
 

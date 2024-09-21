@@ -1,11 +1,11 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "./04_app/index.ts",
+  "main": "./src/04_app/index.ts",
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec node -r ts-node/register --env-file=.env ./04_app/index.ts"
+    "dev": "nodemon --exec node -r ts-node/register --env-file=.env ./src/04_app/index.ts"
   },
   "author": "suda",
   "license": "MIT",

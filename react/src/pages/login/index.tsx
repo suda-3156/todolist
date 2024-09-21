@@ -44,7 +44,7 @@ export const LoginForm = () =>  {
           openAlertModal("VALIDATION_ERROR", Result.error.message)
           return
         case "UNAUTHORIZED":
-          openAlertModal("UNAUTHORIZED")
+          openAlertModal("UNAUTHORIZED", Result.error.message)
           return
         default:
           openAlertModal("UNEXPECTED_ERROR")

@@ -2,8 +2,9 @@
 
 export type Category =
   | "DB_ACCESS_ERROR"
-  | "DB_NOT_FOUND"
+  | "RECORD_NOT_FOUND"
   | "VALIDATION_ERROR"
+  | "UNAUTHORIZED"
 
 
 export class UseCaseError extends Error {

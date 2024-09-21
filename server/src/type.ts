@@ -32,3 +32,8 @@ export class Failure<E extends Error> {
     return true
   }
 }
+
+// NOTE: universalエラーを作るべきか
+// class UniversalError extends Error {
+//   category: 
+// }

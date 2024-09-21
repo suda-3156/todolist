@@ -1,15 +1,8 @@
-/**
- * ユーザーに関する処理．
- * 認証，認可はauth仁かく．
- * ここで書くのは，login, register, list, deleteの処理．
- * よって，ほぼない．
- */
-
 import { randomUUID } from "crypto";
-import { IUserRepository, User_details } from "../01_repository/UserRepository";
+import { IUserRepository, User_details } from "../../01_repository/UserRepository";
 // import { IRoleRepository } from "../01_repository/RoleRepository";
-import { UseCaseError } from "./UseCaseError";
-import { Failure, Result } from "../type";
+import { UseCaseError } from "../UseCaseError";
+import { Failure, Result } from "../../type";
 
 export class CreateUserUseCaseError extends UseCaseError {}
 
@@ -34,23 +27,20 @@ export class CreateUserUseCase implements ICreateUserUseCase {
   }
 
   execute = async (newUser: NewUser) :Promise<Result<User_details, CreateUserUseCaseError>> => {
-    // roleの確認
-    // await this.RR.findByRole(newUser.role)
-    //   .catch((error) => {
-    //     if (error instanceof DBAccessError) {
-    //       throw new CreateUserUseCaseError("DB_ACCESS_ERROR")
-    //     }
-    //     throw new CreateUserUseCaseError("DB_NOT_FOUND", "role not found")
-    //   })
-
     const nameExists = await this.UR.findByName(newUser.name)
-    if ( nameExists.isSuccess() ) {
+    if ( nameExists.isFailure() ) {
+      return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("DB_ACCESS_ERROR"))
+    }
+    if ( nameExists.value ) {
       return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("VALIDATION_ERROR", "This username is already used."))
     }
     
     const emailExists = await this.UR.findByName(newUser.email)
-    if ( emailExists.isSuccess() ) {
-      return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("VALIDATION_ERROR", "This username is already used."))
+    if ( emailExists.isFailure() ) {
+      return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("DB_ACCESS_ERROR"))
+    }
+    if ( emailExists.value ) {
+      return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("VALIDATION_ERROR", "This email is already used."))
     }
 
     const newId = randomUUID().toString()
@@ -58,15 +48,12 @@ export class CreateUserUseCase implements ICreateUserUseCase {
     
     // roleの存在確認はどうせ中でやる
     const userRes = await this.UR.upsertUser({
+      ...newUser,
       user_id: newId,
-      name: newUser.name,
-      email: newUser.email,
-      password: newUser.password,
-      role: newUser.role,
       last_login: last_login
     })
     if ( userRes.isFailure() ) {
-      return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("DB_NOT_FOUND"))
+      return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("DB_ACCESS_ERROR"))
     }
 
     return userRes

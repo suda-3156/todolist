@@ -32,7 +32,7 @@ model Role {
 
 model Style {
   style_id      Int       @id @default(autoincrement())
-  style         String    @db.VarChar(255)
+  style         String    @db.VarChar(255) @unique
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   todolist      Todolist[]
@@ -47,7 +47,7 @@ model Todolist {
   todolist_title  String    @default("No title")
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
-  user            User      @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict)
+  user            User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
   style           Style     @relation(fields: [style_id], references: [style_id], onDelete: Restrict, onUpdate: Restrict)
   todo            Todo[]
 }
@@ -62,7 +62,7 @@ model Todo {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   style           Style     @relation(fields: [style_id], references: [style_id], onDelete: Restrict, onUpdate: Restrict)
-  todolist        Todolist  @relation(fields: [todolist_id], references: [todolist_id], onDelete: Restrict, onUpdate: Restrict)
+  todolist        Todolist  @relation(fields: [todolist_id], references: [todolist_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Note {
@@ -74,5 +74,5 @@ model Note {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   style           Style     @relation(fields: [style_id], references: [style_id], onDelete: Restrict, onUpdate: Restrict)
-  user            User      @relation(fields: [user_id], references: [user_id], onDelete: Restrict, onUpdate: Restrict)
+  user            User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }

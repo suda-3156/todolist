@@ -7,6 +7,7 @@
 import { PrismaClient } from "@prisma/client"
 import { RepositoryError } from "./RepositoryError"
 import { Failure, Result, Success } from "../type"
+import CryptoJS from "crypto-js"
 
 
 type upsertUserType = {
@@ -28,7 +29,6 @@ export type User_details = {
 }
 
 export interface IUserRepository {
-  // findById: (id: string) => Promise<User_details | RepositoryError>
   findById: (id: string) => Promise<Result<User_details, RepositoryError>>
   findByName: (name: string) => Promise<Result<User_details, RepositoryError>>
   findByEmail: (email: string) => Promise<Result<User_details, RepositoryError>>

@@ -33,8 +33,8 @@ export class UserController implements IUserController {
     
     // create new user
     const newUser_or_error = await this.CreateUserUseCase.execute(result.data)
-    if ( newUser_or_error instanceof CreateUserUseCaseError) {
-      switch (newUser_or_error.category) {
+    if ( newUser_or_error.isFailure() ) {
+      switch (newUser_or_error.error.category) {
         case "DB_NOT_FOUND":
           return res.status(400).json({
             title: "PARAMETER_ERROR",
@@ -46,7 +46,7 @@ export class UserController implements IUserController {
           return res.status(422).json({
             title: "VALIDATION_ERROR",
             category: "VALIDATION_ERROR",
-            message: newUser_or_error.message,
+            message: newUser_or_error.error.message,
             status: 422
           })
         default:
@@ -58,7 +58,7 @@ export class UserController implements IUserController {
           return res.status(500).json(response) 
       }
     }
-    const newUser = newUser_or_error
+    const newUser = newUser_or_error.value
 
     // generate a jwt
     const accessToken = generateJWT(newUser.user_id)

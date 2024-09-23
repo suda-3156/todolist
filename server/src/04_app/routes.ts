@@ -32,7 +32,7 @@ router.post("/login",
   userController.login
 )
 router.post("/verify",
-  userController.verifyToken
+  userController.authenticate
 )
 
 export const authRouter = Router()

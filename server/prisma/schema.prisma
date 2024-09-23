@@ -19,6 +19,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   role          Role      @relation(fields: [role_id], references: [role_id], onUpdate: Restrict, onDelete: Restrict)
   todolist      Todolist[]
+  todo          Todo[]
   note          Note[]
 }
 
@@ -55,6 +56,7 @@ model Todolist {
 model Todo {
   todo_id         String    @id @db.VarChar(255)
   todolist_id     String
+  user_id         String
   style_id        Int
   todo_title      String    @default("No title") @db.VarChar(255)
   completed       Boolean   @default(false)
@@ -63,6 +65,7 @@ model Todo {
   updatedAt       DateTime  @updatedAt
   style           Style     @relation(fields: [style_id], references: [style_id], onDelete: Restrict, onUpdate: Restrict)
   todolist        Todolist  @relation(fields: [todolist_id], references: [todolist_id], onDelete: Cascade, onUpdate: Cascade)
+  user            User      @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: Cascade)
 }
 
 model Note {

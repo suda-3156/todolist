@@ -1,12 +1,12 @@
 import { z } from "zod"
 
 
-export const NewTodoSchema = z.object({
+export const EditTodolistSchema = z.object({
   todolist_id: z
     .string()
     .trim()
     .min(1, { message: "invalid todolist_id" }),
-  todo_title: z
+  todolist_title: z
     .string()
     .trim()
     .min(1, { message: "invalid todo title" })

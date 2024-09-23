@@ -18,7 +18,8 @@ export type Todo = {
   completed: boolean,
   deleted: boolean,
   style: string,
-  updatedAt: Date
+  updatedAt: Date,
+  name: string
 }
 
 
@@ -27,16 +28,16 @@ export interface ITodolistRepository {
   findByTodolistId: (todolist_id: string,) => Promise<Result<Todolist_attrs, RepositoryError>>
   findByTodoId: (todo_id: string) => Promise<Result<Todo, RepositoryError>>
 
-  // user_id, todolist_idでそれぞれ、todolistのlist、todosをかえす
-  getListByUserId: (user_id: string) => Promise<Result<Todolist_attrs[], RepositoryError>>
+  // 親のIDで子を返す
+  getListByUserId: (user_id: string, skip: number, take: number) => Promise<Result<Todolist_attrs[], RepositoryError>>
   getListByTodolistId: (todolist_id: string, skip: number, take: number) => Promise<Result<Todo[], RepositoryError>>
 
-  // todolist_idでtodolist_attrsをupsert or delete
+  // idでupsert
   upsertTodolist: (todolist_attrs: Todolist_attrs) => Promise<Result<Todolist_attrs, RepositoryError>>
-  deleteTodolist: (todolist_id: string) => Promise<Result<Todolist_attrs, RepositoryError>>
-  
-  // todo_idでupsert or deleteする
   upsertTodo: (todo: Todo) => Promise<Result<Todo, RepositoryError>>
+  
+  // idでdelete
+  deleteTodolist: (todolist_id: string) => Promise<Result<Todolist_attrs, RepositoryError>>
   deleteTodo: (todo_id: string) => Promise<Result<Todo, RepositoryError>>
 }
 

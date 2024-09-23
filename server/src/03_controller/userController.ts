@@ -14,23 +14,16 @@ import { IVerifyUserIdUseCase } from "../02_usecase/Account/VerifyUserIdUseCase"
 export interface IUserController {
   createUser: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
   login: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
-  verifyToken: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
+  authenticate: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
+  verifyToken: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>> | undefined
 }
 
 export class UserController implements IUserController {
-  private CreateUserUseCase: ICreateUserUseCase
-  private LoginUseCase: ILoginUseCase
-  private VerifyUserIdUseCase: IVerifyUserIdUseCase 
-
   constructor(
-    CreateUserUseCase: ICreateUserUseCase,
-    LoginUseCase: ILoginUseCase,
-    VerifyUserIdUseCase: IVerifyUserIdUseCase,
-  ) {
-    this.CreateUserUseCase = CreateUserUseCase
-    this.LoginUseCase = LoginUseCase
-    this.VerifyUserIdUseCase = VerifyUserIdUseCase
-  }
+    private CreateUserUseCase: ICreateUserUseCase,
+    private LoginUseCase: ILoginUseCase,
+    private VerifyUserIdUseCase: IVerifyUserIdUseCase,
+  ) {}
 
   createUser = async (req: Request, res: Response) => {
     // parameter check
@@ -145,7 +138,7 @@ export class UserController implements IUserController {
     })
   }
 
-  verifyToken = async (req: Request, res: Response) => {
+  authenticate = async (req: Request, res: Response) => {
     const jwt = decodeJWT(req)
     if ( jwt.isFailure() ) {
       return res.status(401).json({
@@ -185,6 +178,41 @@ export class UserController implements IUserController {
         role: user.role
       }
     })
+  }
+
+  verifyToken = async (req: Request, res: Response, next: NextFunction) => {
+    const jwt = decodeJWT(req)
+    if ( jwt.isFailure() ) {
+      return res.status(401).json({
+        title: "UNAUTHORIZED",
+        category: "UNAUTHORIZED",
+        message: "You don't have any valid token.",
+        status: 401
+      })
+    }
+
+    const user_or_error = await this.VerifyUserIdUseCase.execute(jwt.value.user_id)
+    if ( user_or_error.isFailure() ) {
+      switch (user_or_error.error.category) {
+        case "RECORD_NOT_FOUND":
+          return res.status(422).json({
+            title: "RECORD_NOT_FOUND",
+            category: "VALIDATION_ERROR",
+            message: "user not found",
+            status: 422
+          })
+        default:
+          const response :ApiError = {
+            title: "FAILED_TO_LOGIN",
+            category: "SYSTEM_ERROR",
+            status: 500
+          }
+          return res.status(500).json(response) 
+      }
+    }
+
+    req.body.user = user_or_error.value
+    next()
   }
 }
 

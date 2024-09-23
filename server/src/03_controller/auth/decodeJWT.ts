@@ -1,4 +1,4 @@
-import { Request } from "express"
+import { Request, Response } from "express"
 import JWT from "jsonwebtoken"
 import { Failure, Result, Success } from "../../type"
 
@@ -11,7 +11,7 @@ type TokenPayload = {
 
 export class TokenError extends Error {}
 
-export const decodeJWT = (req :Request) :Result<TokenPayload, TokenError>=> {
+const decodeJWT = (req :Request) :Result<TokenPayload, TokenError>=> {
   const bearerHeader = req.headers["authorization"]
   if ( bearerHeader ) {
     const bearer = bearerHeader.split(" ")[1]

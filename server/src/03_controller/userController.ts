@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { ICreateUserUseCase } from "../02_usecase/Account/CreateUserUseCase";
 import { NewUserSchema } from "./validation/NewUserSchema";
 import { ApiError, ParamsApiError } from "./type";
@@ -115,7 +115,7 @@ export class UserController implements IUserController {
           return res.status(401).json({
             title: "UNAUTHORIZED",
             category: "UNAUTHORIZED",
-            message: "username or password is wrong",
+            message: "name or password is wrong",
             status: 401
           })
         default:

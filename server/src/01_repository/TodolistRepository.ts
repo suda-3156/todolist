@@ -7,7 +7,7 @@ export type Todolist_attrs = {
   todolist_id: string,
   todolist_title: string,
   style: string,
-  username: string,
+  name: string,
   updatedAt: Date,
 }
 
@@ -65,7 +65,7 @@ export class TodolistRepository implements ITodolistRepository {
   
       const todolist_attrs = {
         ...raw_todolist_attrs,
-        username: raw_todolist_attrs.user.name,
+        name: raw_todolist_attrs.user.name,
         style: raw_todolist_attrs.style.style
       }
       return new Success<Todolist_attrs>(todolist_attrs)
@@ -122,7 +122,7 @@ export class TodolistRepository implements ITodolistRepository {
           todolist_id: raw_todolist_attrs.todolist_title,
           todolist_title: raw_todolist_attrs.todolist_id,
           style: raw_todolist_attrs.style.style,
-          username: raw_todolist_attrs.user.name,
+          name: raw_todolist_attrs.user.name,
           updatedAt: raw_todolist_attrs.updatedAt
         }
       })
@@ -170,7 +170,7 @@ export class TodolistRepository implements ITodolistRepository {
         where: { style: todolist_attrs.style }
       })
       const user_data = await this.prisma.user.findUnique({
-        where: { name: todolist_attrs.username }
+        where: { name: todolist_attrs.name }
       })
       if ( !style_data || !user_data ) {
         return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
@@ -195,7 +195,7 @@ export class TodolistRepository implements ITodolistRepository {
         todolist_id: new_todolist_attrs.todolist_id,
         todolist_title: new_todolist_attrs.todolist_title,
         style: style_data.style,
-        username: user_data.name,
+        name: user_data.name,
         updatedAt: new_todolist_attrs.updatedAt
       }
 
@@ -223,7 +223,7 @@ export class TodolistRepository implements ITodolistRepository {
         todolist_id: todolist_attrs.todolist_id,
         todolist_title: todolist_attrs.todolist_title,
         style: todolist_attrs.style.style,
-        username: todolist_attrs.user.name,
+        name: todolist_attrs.user.name,
         updatedAt: todolist_attrs.updatedAt
       }
 
@@ -239,6 +239,13 @@ export class TodolistRepository implements ITodolistRepository {
         where: { style: todo.style }
       })
       if ( !style_data ) {
+        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
+      }
+      
+      const todolist_data = await this.prisma.todolist.findUnique({
+        where: { todolist_id: todo.todolist_id }
+      })
+      if ( !todolist_data ) {
         return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
       }
   

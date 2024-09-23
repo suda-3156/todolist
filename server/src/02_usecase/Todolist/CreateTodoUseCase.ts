@@ -35,6 +35,9 @@ export class CreateTodoUseCase implements ICreateTodoUseCase {
       updatedAt: newDate
     })
     if ( todoRes.isFailure() ) {
+      if ( todoRes.error.errorType === "RECORD_NOT_FOUND") {
+        return new Failure<UseCaseError>(new UseCaseError("RECORD_NOT_FOUND"))
+      }
       return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
     }
 

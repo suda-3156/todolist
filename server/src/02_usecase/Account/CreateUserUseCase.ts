@@ -32,7 +32,7 @@ export class CreateUserUseCase implements ICreateUserUseCase {
       return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("DB_ACCESS_ERROR"))
     }
     if ( nameExists.value ) {
-      return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("VALIDATION_ERROR", "This username is already used."))
+      return new Failure<CreateUserUseCaseError>(new CreateUserUseCaseError("VALIDATION_ERROR", "This name is already used."))
     }
     
     const emailExists = await this.UR.findByName(newUser.email)

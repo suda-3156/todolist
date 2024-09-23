@@ -10,11 +10,11 @@ import { UseCaseError } from "../UseCaseError"
 //   todos: Todo[]
 // }
 
-export interface IGetTodosUseCase {
+export interface IRetrieveTodosUseCase {
   execute: (todolist_id: string, skip: number, take: number) => Promise<Result<Todo[], UseCaseError>>
 }
 
-export class GetTodosUseCase implements IGetTodosUseCase {
+export class RetrieveTodosUseCase implements IRetrieveTodosUseCase {
   TR: ITodolistRepository
 
   constructor( TodolistRepository: ITodolistRepository) {

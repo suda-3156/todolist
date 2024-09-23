@@ -11,11 +11,11 @@ type Todolist = {
   todos: Todo[]
 }
 
-export interface IGetTodolistOverviewUseCase {
-  execute: (username: string) => Promise<Result<Todolist[], UseCaseError>>
+export interface IRetrieveTodolistOverviewUseCase {
+  execute: (name: string) => Promise<Result<Todolist[], UseCaseError>>
 }
 
-export class GetTodolistOverviewUseCase implements IGetTodolistOverviewUseCase {
+export class RetrieveTodolistOverviewUseCase implements IRetrieveTodolistOverviewUseCase {
   TR: ITodolistRepository
   UR: IUserRepository
 
@@ -24,8 +24,8 @@ export class GetTodolistOverviewUseCase implements IGetTodolistOverviewUseCase {
     this.UR = UserRepository
   }
 
-  execute = async (username: string) :Promise<Result<Todolist[], UseCaseError>> => {
-    const user_data = await this.UR.findByName(username)
+  execute = async (name: string) :Promise<Result<Todolist[], UseCaseError>> => {
+    const user_data = await this.UR.findByName(name)
     if ( user_data.isFailure() ){
       if ( user_data.error.errorType === "RECORD_NOT_FOUND") {
         return new Failure<UseCaseError>(new UseCaseError("RECORD_NOT_FOUND"))

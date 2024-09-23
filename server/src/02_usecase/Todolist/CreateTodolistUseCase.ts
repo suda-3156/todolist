@@ -8,7 +8,7 @@ import { UseCaseError } from "../UseCaseError"
 
 type NewTodolist = {
   todolist_title: string,
-  username: string,
+  name: string,
   style: string,
 }
 

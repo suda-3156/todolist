@@ -1,7 +1,14 @@
 /**
  * UserRepository
+ * 
  * ユーザーの基本情報：
- *  user_id, name, email, password, last_login, roleをとる
+ *  user_id:      string
+ *  name:         string  max: 32
+ *  plain_email:  string  max: 128  dbではhash化して保管
+ *  plain_pwd:    string  max: 32   dbではhash化して保管
+ *  role_id:      number
+ *  last_login:   Date
+ *  updatedAt:    Date
  */
 
 import { PrismaClient } from "@prisma/client"
@@ -10,272 +17,292 @@ import { Failure, Result, Success } from "../type"
 import CryptoJS from "crypto-js"
 
 
-type upsertUserType = {
-  user_id: string,
-  name: string,
-  password: string,
-  email: string,
-  last_login: Date,
-  role: string
+export type UserType = {
+  user_id:      string,
+  name:         string,
+  plain_email:  string,
+  plain_pwd:    string,
+  role_id:      number,
+  last_login:   Date,
+  updatedAt:    Date
 }
 
-export type User_details = {
-  user_id: string,
-  name: string,
-  email: string,
-  password: string,
-  last_login: Date,
-  role: string
+type UpsertUserType = {
+  user_id:      string,
+  name:         string,
+  plain_email:  string,
+  plain_pwd:    string,
+  role_id:      number,
+  last_login:   Date,
 }
+
+// TODO: 消す.
+// export type User_details = {
+//   user_id: string,
+//   name: string,
+//   email: string,
+//   password: string,
+//   last_login: Date,
+//   role: string
+// }
+
 
 export interface IUserRepository {
-  findById: (id: string) => Promise<Result<User_details, RepositoryError>>
-  findByName: (name: string) => Promise<Result<User_details, RepositoryError>>
-  findByEmail: (email: string) => Promise<Result<User_details, RepositoryError>>
-  getUserList: (skip: number, take: number) => Promise<Result<User_details[], RepositoryError>>
-  upsertUser: ({ user_id, name, password, email } : upsertUserType) => Promise<Result<User_details, RepositoryError>>
-  deleteUser: (user_id: string) => Promise<Result<User_details, RepositoryError>>
+  // find
+  findById: (id: string) 
+    => Promise<Result<UserType, RepositoryError>>
+  findByName: (name: string) 
+    => Promise<Result<UserType, RepositoryError>>
+  findByEmail: (email: string) 
+    => Promise<Result<UserType, RepositoryError>>
+
+  // get list
+  getUserList: (skip: number, take: number) 
+    => Promise<Result<UserType[], RepositoryError>>
+
+  // upsert
+  upsertUser: ({ user_id, name, plain_email, plain_pwd, role_id, last_login }: UpsertUserType) 
+    => Promise<Result<UserType, RepositoryError>>
+  
+  // delete
+  deleteUser: (user_id: string) 
+    => Promise<Result<UserType, RepositoryError>>
 }
 
 export class UserRepository implements IUserRepository {
-  private prisma: PrismaClient
+  constructor(
+    private prisma: PrismaClient
+  ){}
 
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma
-  }
+  findById = async (
+    user_id: string
+  ) :Promise<Result<UserType, RepositoryError>> => {
+    const user_or_error = await ( async() => {
+      try {
+        return await this.prisma.user.findUnique({
+          where: { user_id: user_id }
+        })
+      } catch (error) {
+        return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+      }})()
 
-  // TODO: letとかを使って、try-catchの中身を少なくすべきだと思う。いやでも、ここでエラーの型安産性を保つために仕方ないか？
-
-  findById = async (user_id: string) :Promise<Result<User_details, RepositoryError>> => {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: { user_id: user_id }
-      })
-      if ( !user ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-
-      const role_data = await this.prisma.role.findUnique({
-        where: { role_id: user?.role_id }
-      })
-      if ( !role_data ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-
-      const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-      const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-      
-      const res_data = {
-        user_id: user_id,
-        name: user.name,
-        email: decodedEmail,
-        password: decodedPassword,
-        last_login: user.last_login,
-        role: role_data.role
-      }
-      return new Success<User_details>(res_data)
-    } catch (error) {
-      return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+    if ( user_or_error instanceof Failure ){
+      return user_or_error
     }
-  }
-
-  findByName = async (name: string) :Promise<Result<User_details, RepositoryError>> => {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: { name: name }
-      })
-      if ( !user ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-      
-  
-      const role_data = await this.prisma.role.findUnique({
-        where: { role_id: user?.role_id }
-      })
-      if ( !role_data ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-  
-      // decode
-      const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-      const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-  
-      const res_data = {
-        user_id: user.user_id,
-        name: user.name,
-        email: decodedEmail,
-        password: decodedPassword,
-        last_login: user.last_login,
-        role: role_data.role
-      }
-      return new Success<User_details>(res_data)
-    } catch (error) {
-      return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+    if ( user_or_error === null ) {
+      return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
     }
-  }
 
-  findByEmail = async (email: string) :Promise<Result<User_details, RepositoryError>> => {
-    // encode
-    const encodedEmail = CryptoJS.AES.encrypt(email, process.env.SECRET_KEY!).toString()
+    const user = user_or_error
+
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
     
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: { email: encodedEmail }
-      })
-      if ( !user ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-  
-      const role_data = await this.prisma.role.findUnique({
-        where: { role_id: user?.role_id }
-      })
-      if ( !role_data ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-  
-      // decode
-      const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-  
-      const res_data = {
-        user_id: user.user_id,
-        name: user.name,
-        email: email,
-        password: decodedPassword,
-        last_login: user.last_login,
-        role: role_data.role
-      }
-      return new Success<User_details>(res_data)
-    } catch (error) {
-      return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
-    }
+    return new Success<UserType>({
+      user_id:      user.user_id,
+      name:         user.name,
+      plain_email:  decodedEmail,
+      plain_pwd:    decodedPassword,
+      role_id:      user.role_id,
+      last_login:   user.last_login,
+      updatedAt:    user.updatedAt,
+    })
   }
 
-  getUserList = async (skip: number, take: number) :Promise<Result<User_details[], RepositoryError>> => {
-    try {
-      const raw_users_list = await this.prisma.user.findMany({
-        skip: skip,
-        take: take,
-        select: {
-          user_id: true,
-          name: true,
-          password: true,
-          email: true,
-          last_login: true,
-          role: {
-            select: {
-              role: true
-            }
+  findByName = async (
+    name: string
+  ) :Promise<Result<UserType, RepositoryError>> => {
+    const user_or_error = await ( async() => {
+      try {
+        return await this.prisma.user.findUnique({
+          where: { name: name }
+        })
+      } catch (error) {
+        return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+      }})()
+
+    if ( user_or_error instanceof Failure ){
+      return user_or_error
+    }
+    if ( user_or_error === null ) {
+      return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
+    }
+
+    const user = user_or_error
+
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+
+    return new Success<UserType>({
+      user_id:      user.user_id,
+      name:         user.name,
+      plain_email:  decodedEmail,
+      plain_pwd:    decodedPassword,
+      role_id:      user.role_id,
+      last_login:   user.last_login,
+      updatedAt:    user.updatedAt,
+    })
+  }
+
+  findByEmail = async (
+    plain_email: string
+  ) :Promise<Result<UserType, RepositoryError>> => {
+    const encodedEmail = CryptoJS.AES.encrypt(plain_email, process.env.SECRET_KEY!).toString()
+
+    const user_or_error = await ( async() => {
+      try {
+        return await this.prisma.user.findUnique({
+          where: { email: encodedEmail }
+        })
+      } catch (error) {
+        return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+      }})()
+
+    if ( user_or_error instanceof Failure ){
+      return user_or_error
+    }
+    if ( user_or_error === null ) {
+      return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
+    }
+
+    const user = user_or_error
+
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+
+    return new Success<UserType>({
+      user_id:      user.user_id,
+      name:         user.name,
+      plain_email:  decodedEmail,
+      plain_pwd:    decodedPassword,
+      role_id:      user.role_id,
+      last_login:   user.last_login,
+      updatedAt:    user.updatedAt,
+    })
+  }
+
+  getUserList = async (
+    skip: number,
+    take: number
+  ) :Promise<Result<UserType[], RepositoryError>> => {
+    const rawdata_or_error = await ( async() => {
+      try {
+        return await this.prisma.user.findMany({
+          skip: skip,
+          take: take,
+        })
+      } catch (error) {
+        return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+      }})()
+
+    if ( rawdata_or_error instanceof Failure ){
+      return rawdata_or_error
+    }
+
+    const users_list = rawdata_or_error.map((user) => {
+      // decode. 
+      const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+      const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+      // 整形.
+      return {
+        user_id:      user.user_id,
+        name:         user.name,
+        plain_email:  decodedEmail,
+        plain_pwd:    decodedPassword,
+        role_id:      user.role_id,
+        last_login:   user.last_login,
+        updatedAt:    user.updatedAt,
+      }
+    })
+
+    return new Success<UserType[]>(users_list)
+  }
+
+  upsertUser = async ({ 
+    user_id,
+    name,
+    plain_pwd,
+    plain_email,
+    role_id,
+    last_login,
+  }: UpsertUserType) :Promise<Result<UserType, RepositoryError>> => {
+
+    const encodedEmail = CryptoJS.AES.encrypt(plain_email, process.env.SECRET_KEY!).toString()
+    const encodedPassword = CryptoJS.AES.encrypt(plain_pwd, process.env.SECRET_KEY!).toString()
+
+    const user_or_error = await ( async() => {
+      try {
+        return await this.prisma.user.upsert({
+          where: { user_id: user_id },
+          create: {
+            user_id:    user_id,
+            name:       name,
+            password:   encodedPassword,
+            email:      encodedEmail,
+            role_id:    role_id,
+            last_login: last_login,
+          },
+          update: {
+            name:       name,
+            password:   encodedPassword,
+            email:      encodedEmail,
+            role_id:    role_id,
+            last_login: last_login,
           }
-        }
-      })
-      
-      const users_list = raw_users_list.map((user) => {
-        //decode 
-        const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-        const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-        return {
-          user_id: user.user_id,
-          name: user.name,
-          email: decodedEmail,
-          password: decodedPassword,
-          last_login: user.last_login,
-          role: user.role.role
-        }
-      })
-      
-      return new Success<User_details[]>(users_list)
-    } catch (error) {
-      return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+        })
+      } catch (error) {
+        return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+      }})()
+
+    if ( user_or_error instanceof Failure ){
+      return user_or_error
     }
+
+    const user = user_or_error
+
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    
+    return new Success<UserType>({
+      user_id:      user.user_id,
+      name:         user.name,
+      plain_email:  decodedEmail,
+      plain_pwd:    decodedPassword,
+      role_id:      user.role_id,
+      last_login:   user.last_login,
+      updatedAt:    user.updatedAt,
+    })
   }
 
-  upsertUser = async ({ user_id, name, password, email, last_login, role }: upsertUserType) :Promise<Result<User_details, RepositoryError>> => {
-    // encode
-    const encodedEmail = CryptoJS.AES.encrypt(email, process.env.SECRET_KEY!).toString()
-    const encodedPassword = CryptoJS.AES.encrypt(password, process.env.SECRET_KEY!).toString()
+  deleteUser = async (
+    user_id: string
+  ) :Promise<Result<UserType, RepositoryError>> => {
+    const user_or_error = await ( async() => {
+      try {
+        return await this.prisma.user.delete({
+          where: { user_id: user_id }
+        })
+      } catch (error) {
+        return new Failure<RepositoryError>(new RepositoryError("DB_ACCESS_ERROR"))
+      }})()
 
-    try {
-      const role_data = await this.prisma.role.findFirst({
-        where: { role: role }
-      })
-      if ( !role_data ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-      
-      const user = await this.prisma.user.upsert({
-        where: { user_id: user_id },
-        create: {
-          user_id: user_id,
-          name: name,
-          email: encodedEmail,
-          password: encodedPassword,
-          last_login: last_login,
-          role_id: role_data.role_id
-        },
-        update: {
-          name: name,
-          email: encodedEmail,
-          password: encodedPassword,
-          last_login: last_login,
-          role_id: role_data.role_id
-        }
-      })
-  
-      // decode
-      const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-      const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-  
-      
-      const res_data = {
-        user_id: user.user_id,
-        name: user.name,
-        email: decodedEmail,
-        password: decodedPassword,
-        last_login: user.last_login,
-        role: role_data.role
-      }
-      return new Success<User_details>(res_data)
-    } catch (error) {
-      return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
+    if ( user_or_error instanceof Failure ){
+      return user_or_error
     }
-  }
 
-  deleteUser = async (user_id: string) :Promise<Result<User_details, RepositoryError>> => {
-    try {
-      const user = await this.prisma.user.findUnique({
-        where: { user_id: user_id }
-      })
-      if ( !user ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-  
-      const role_data = await this.prisma.role.findFirst({
-        where: { role_id: user.role_id }
-      })
-      if ( !role_data ) {
-        return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-      }
-  
-      await this.prisma.user.delete({
-        where: { user_id: user_id }
-      })
-  
-      // decode
-      const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-      const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
-      
-  
-      const res_data = {
-        user_id: user.user_id,
-        name: user.name,
-        email: decodedEmail,
-        password: decodedPassword,
-        last_login: user.last_login,
-        role: role_data.role
-      }
-      return new Success<User_details>(res_data)
-    } catch (error) {
-      return new Failure<RepositoryError>(new RepositoryError("RECORD_NOT_FOUND"))
-    }
+    const user = user_or_error
+
+    const decodedEmail = CryptoJS.AES.decrypt(user.email, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    const decodedPassword = CryptoJS.AES.decrypt(user.password, process.env.SECRET_KEY!).toString(CryptoJS.enc.Utf8)
+    
+    return new Success<UserType>({
+      user_id:      user.user_id,
+      name:         user.name,
+      plain_email:  decodedEmail,
+      plain_pwd:    decodedPassword,
+      role_id:      user.role_id,
+      last_login:   user.last_login,
+      updatedAt:    user.updatedAt,
+    })
   }
 }

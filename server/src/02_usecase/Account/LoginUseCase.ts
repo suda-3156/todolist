@@ -1,36 +1,37 @@
-import { IUserRepository, User_details } from "../../01_repository/UserRepository";
+import { IUserRepository, UserType } from "../../01_repository/UserRepository";
 import { UseCaseError } from "../UseCaseError";
 import { Failure, Result } from "../../type";
 
-export class LoginUseCaseError extends UseCaseError {}
-
-export type User = {
-  name: string,
-  password: string,
+export type LoginUser = {
+  name:       string,
+  plain_pwd:  string,
 }
 
 export interface ILoginUseCase {
-  execute: (user: User) => Promise<Result<User_details, LoginUseCaseError>>
+  execute: (user: LoginUser) => Promise<Result<UserType, UseCaseError>>
 }
 
 export class LoginUseCase implements ILoginUseCase {
-  private UR: IUserRepository
+  constructor(
+    private readonly UR: IUserRepository
+  ){}
 
-  constructor(UserRepository: IUserRepository) {
-    this.UR = UserRepository
-  }
-
-  execute = async (user: User) :Promise<Result<User_details, LoginUseCaseError>> => {    
+  execute = async (
+    user: LoginUser
+  ) :Promise<Result<UserType, UseCaseError>> => {    
     const userRes = await this.UR.findByName(user.name)
+
     if ( userRes.isFailure() ) {
-      if ( userRes.error.errorType === "RECORD_NOT_FOUND") {
-        return new Failure<LoginUseCaseError>(new LoginUseCaseError("RECORD_NOT_FOUND"))
+      switch ( userRes.error.category ) {
+        case "RECORD_NOT_FOUND":
+          return new Failure<UseCaseError>(new UseCaseError("RECORD_NOT_FOUND"))
+        default:
+          return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
       }
-      return new Failure<LoginUseCaseError>(new LoginUseCaseError("DB_ACCESS_ERROR"))
     }
 
-    if ( userRes.value.password !== user.password ) {
-      return new Failure<LoginUseCaseError>(new LoginUseCaseError("UNAUTHORIZED"))
+    if ( userRes.value.plain_pwd !== user.plain_pwd ) {
+      return new Failure<UseCaseError>(new UseCaseError("UNAUTHORIZED"))
     }
 
     return userRes

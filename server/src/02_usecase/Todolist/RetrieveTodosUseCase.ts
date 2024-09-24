@@ -1,32 +1,37 @@
-import { ITodolistRepository, Todo, Todolist_attrs } from "../../01_repository/TodolistRepository"
+import { ITodolistRepository, TodoType, Todolist_attrs } from "../../01_repository/TodolistRepository"
 import { Failure, Result } from "../../type"
 import { UseCaseError } from "../UseCaseError"
 
 
 
 
-// type Todolist = {
-//   todolist_attrs: Todolist_attrs,
-//   todos: Todo[]
-// }
 
 export interface IRetrieveTodosUseCase {
-  execute: (todolist_id: string, skip: number, take: number) => Promise<Result<Todo[], UseCaseError>>
+  execute: (todolist_id: string, skip: number, take: number) 
+    => Promise<Result<TodoType[], UseCaseError>>
 }
 
 export class RetrieveTodosUseCase implements IRetrieveTodosUseCase {
-  TR: ITodolistRepository
+  constructor(
+    private readonly TR: ITodolistRepository
+  ){}
 
-  constructor( TodolistRepository: ITodolistRepository) {
-    this.TR = TodolistRepository
-  }
-
-  execute = async (todolist_id: string, skip: number, take: number) :Promise<Result<Todo[], UseCaseError>> => {
-    const todos = await this.TR.getListByTodolistId(todolist_id, skip, take)
-    if ( todos.isFailure() ) { 
-      return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
+  execute = async (
+    todolist_id:  string,
+    skip:         number,
+    take:         number,
+  ) :Promise<Result<TodoType[], UseCaseError>> => {
+    const todosRes = await this.TR.getListByTodolistId(todolist_id, skip, take)
+    
+    if ( todosRes.isFailure() ) {
+      switch ( todosRes.error.category ) {
+        case "RECORD_NOT_FOUND":
+          return new Failure<UseCaseError>(new UseCaseError("RECORD_NOT_FOUND"))
+        default:
+          return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
+      }
     }
 
-    return todos
+    return todosRes
   }
 }

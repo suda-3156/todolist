@@ -1,4 +1,11 @@
 
+export type Category =
+  | "DB_ACCESS_ERROR"
+  | "RECORD_NOT_FOUND"
+  | "VALIDATION_ERROR"
+  | "UNAUTHORIZED"
+  | "UNKNOWN_ERROR"
+
 export type Result<T, E extends Error> = Success<T> | Failure<E>
 
 export class Success<T> {

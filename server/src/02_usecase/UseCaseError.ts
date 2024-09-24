@@ -1,10 +1,4 @@
-
-
-export type Category =
-  | "DB_ACCESS_ERROR"
-  | "RECORD_NOT_FOUND"
-  | "VALIDATION_ERROR"
-  | "UNAUTHORIZED"
+import { Category } from "../type"
 
 
 export class UseCaseError extends Error {

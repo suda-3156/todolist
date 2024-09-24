@@ -1,15 +1,11 @@
-
-
-export type ErrorType = 
-  | "DB_ACCESS_ERROR"
-  | "RECORD_NOT_FOUND"
+import { Category } from "@/type"
 
 export class RepositoryError extends Error {
-  errorType: ErrorType
+  category: Category
 
-  constructor(errorType :ErrorType){
+  constructor(category :Category){
     super()
-    this.errorType = errorType
+    this.category = category
   }
 }
 

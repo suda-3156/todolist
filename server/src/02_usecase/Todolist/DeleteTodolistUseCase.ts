@@ -9,18 +9,23 @@ export interface IDeleteTodolistUseCase {
 }
 
 export class DeleteTodolistUseCase implements IDeleteTodolistUseCase {
-  TR: ITodolistRepository
+  constructor(
+    private readonly TR: ITodolistRepository
+  ){}
 
-  constructor( TodolistRepository: ITodolistRepository) {
-    this.TR = TodolistRepository
-  }
-
-  execute = async (todolist_id: string) :Promise<Result<Todolist_attrs, UseCaseError>> => {
+  execute = async (
+    todolist_id: string
+  ) :Promise<Result<Todolist_attrs, UseCaseError>> => {
     const todolistRes = await this.TR.deleteTodolist(todolist_id)
-    if ( todolistRes.isFailure() ) {
-      return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
-    }
 
+    if ( todolistRes.isFailure() ) {
+      switch ( todolistRes.error.category ) {
+        case "RECORD_NOT_FOUND":
+          return new Failure<UseCaseError>(new UseCaseError("RECORD_NOT_FOUND"))
+        default:
+          return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
+      }
+    }
     return todolistRes
   }
 }

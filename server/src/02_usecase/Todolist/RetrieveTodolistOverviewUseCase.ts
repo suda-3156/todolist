@@ -1,5 +1,5 @@
-import { ITodolistRepository, Todo, Todolist_attrs } from "../../01_repository/TodolistRepository"
-import { IUserRepository } from "../../01_repository/UserRepository"
+import { ITodolistRepository, TodoType, Todolist_attrs } from "@/01_repository/TodolistRepository"
+import { IUserRepository } from "@/01_repository/UserRepository"
 import { Failure, Result, Success } from "../../type"
 import { UseCaseError } from "../UseCaseError"
 
@@ -8,39 +8,37 @@ import { UseCaseError } from "../UseCaseError"
 
 type Todolist = {
   todolist_attrs: Todolist_attrs,
-  todos: Todo[]
+  todos: TodoType[]
 }
 
 export interface IRetrieveTodolistOverviewUseCase {
-  execute: (name: string) => Promise<Result<Todolist[], UseCaseError>>
+  execute: (user_id: string, skip: number, take: number) 
+    => Promise<Result<Todolist[], UseCaseError>>
 }
 
 export class RetrieveTodolistOverviewUseCase implements IRetrieveTodolistOverviewUseCase {
-  TR: ITodolistRepository
-  UR: IUserRepository
+  constructor(
+    private readonly TR: ITodolistRepository,
+    private readonly UR: IUserRepository
+  ){}
 
-  constructor( TodolistRepository: ITodolistRepository, UserRepository: IUserRepository) {
-    this.TR = TodolistRepository
-    this.UR = UserRepository
-  }
-
-  execute = async (name: string) :Promise<Result<Todolist[], UseCaseError>> => {
-    const user_data = await this.UR.findByName(name)
-    if ( user_data.isFailure() ){
-      if ( user_data.error.errorType === "RECORD_NOT_FOUND") {
-        return new Failure<UseCaseError>(new UseCaseError("RECORD_NOT_FOUND"))
-      }
-      return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
-    }
+  execute = async (
+    user_id:  string, // user_idはverifyTokenで取得するものなので、妥当性チェックはしない.
+    skip:     number,
+    take:     number,
+  ) :Promise<Result<Todolist[], UseCaseError>> => {
     
-    const todolist_attrs_list = await this.TR.getListByUserId(user_data.value.user_id)
+    const todolist_attrs_list = await this.TR.getListByUserId(user_id, skip, take)
     if ( todolist_attrs_list.isFailure() ) {
-      return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
+      switch ( todolist_attrs_list.error.category ) {
+        default:
+          return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
+      }
     }
 
     const todolists = await Promise.all(
       todolist_attrs_list.value.map(async (todolist_attrs) => {
-        const todos = await this.TR.getListByTodolistId(todolist_attrs.todolist_id, 0, 5)
+        const todos = await this.TR.getListByTodolistId(todolist_attrs.todolist_id, 0, 10)
         if ( todos.isFailure() ) {
           throw new Error
         }

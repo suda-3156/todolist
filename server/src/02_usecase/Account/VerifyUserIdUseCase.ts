@@ -1,27 +1,28 @@
-import { IUserRepository, User_details } from "../../01_repository/UserRepository";
+import { IUserRepository, UserType } from "../../01_repository/UserRepository";
 import { UseCaseError } from "../UseCaseError";
 import { Failure, Result } from "../../type";
 
-export class VerifyUserIdUseCaseError extends UseCaseError {}
-
 export interface IVerifyUserIdUseCase {
-  execute: (user_id :string) => Promise<Result<User_details, VerifyUserIdUseCaseError>>
+  execute: (user_id :string) => Promise<Result<UserType, UseCaseError>>
 }
 
 export class VerifyUserIdUseCase implements IVerifyUserIdUseCase {
-  private UR: IUserRepository
+  constructor(
+    private readonly UR: IUserRepository
+  ){}
 
-  constructor(UserRepository: IUserRepository) {
-    this.UR = UserRepository
-  }
-
-  execute = async (user_id: string) :Promise<Result<User_details, VerifyUserIdUseCaseError>> => {    
+  execute = async (
+    user_id: string
+  ) :Promise<Result<UserType, UseCaseError>> => {
     const userRes = await this.UR.findById(user_id)
+
     if ( userRes.isFailure() ) {
-      if ( userRes.error.errorType === "RECORD_NOT_FOUND" ) {
-        return new Failure<VerifyUserIdUseCaseError>(new VerifyUserIdUseCaseError("RECORD_NOT_FOUND"))
+      switch ( userRes.error.category ) {
+        case "RECORD_NOT_FOUND":
+          return new Failure<UseCaseError>(new UseCaseError("RECORD_NOT_FOUND"))
+        default:
+          return new Failure<UseCaseError>(new UseCaseError("DB_ACCESS_ERROR"))
       }
-      return new Failure<VerifyUserIdUseCaseError>(new VerifyUserIdUseCaseError("DB_ACCESS_ERROR"))
     }
 
     return userRes

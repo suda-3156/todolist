@@ -4,7 +4,7 @@
 import express, { Application } from 'express'
 import cors from "cors"
 import { PrismaClient } from "@prisma/client"
-import { authRouter } from './routes'
+import { authRouter } from '@/04_app/routes'
 
 const app :Application = express()
 const PORT = 8080

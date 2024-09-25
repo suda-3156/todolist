@@ -11,12 +11,12 @@ type Todolist = {
   todos: TodoType[]
 }
 
-export interface IRetrieveTodolistOverviewUseCase {
+export interface IGetTodolistOverviewUseCase {
   execute: (user_id: string, skip: number, take: number) 
     => Promise<Result<Todolist[], UseCaseError>>
 }
 
-export class RetrieveTodolistOverviewUseCase implements IRetrieveTodolistOverviewUseCase {
+export class GetTodolistOverviewUseCase implements IGetTodolistOverviewUseCase {
   constructor(
     private readonly TR: ITodolistRepository,
     private readonly UR: IUserRepository

@@ -4,14 +4,12 @@ import { UseCaseError } from "../UseCaseError"
 
 
 
-
-
-export interface IRetrieveTodosUseCase {
+export interface IGetTodosUseCase {
   execute: (todolist_id: string, skip: number, take: number) 
     => Promise<Result<TodoType[], UseCaseError>>
 }
 
-export class RetrieveTodosUseCase implements IRetrieveTodosUseCase {
+export class GetTodosUseCase implements IGetTodosUseCase {
   constructor(
     private readonly TR: ITodolistRepository
   ){}

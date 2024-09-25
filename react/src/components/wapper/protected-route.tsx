@@ -50,7 +50,7 @@ export const ProtectedRoute: FC<ProtectedRouteProps> = ({ redirectTo }) => {
   }
 
   return !user ? (
-    <Navigate to={redirectTo} replace />
+    <Navigate to={redirectTo} replace={true} />
   ) : (
     <Outlet />
   )

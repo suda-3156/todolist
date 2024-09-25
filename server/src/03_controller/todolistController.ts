@@ -1,160 +1,225 @@
 import { Request, Response } from "express";
-import { IClearTodoUseCase } from "../02_usecase/Todolist/ClearTodoUseCase";
+import { ApiError, ParamsApiError } from "./type";
+
 import { ICreateTodolistUseCase } from "../02_usecase/Todolist/CreateTodolistUseCase";
 import { ICreateTodoUseCase } from "../02_usecase/Todolist/CreateTodoUseCase";
-import { IDeleteTodolistUseCase } from "../02_usecase/Todolist/DeleteTodolistUseCase";
+import { IGetTodolistOverviewUseCase } from "@/02_usecase/Todolist/GetTodolistOverviewUseCase";
+import { IGetTodosUseCase } from "@/02_usecase/Todolist/GetTodosUseCase";
 import { IEditTodolistUseCase } from "../02_usecase/Todolist/EditTodolistUseCase";
 import { IEditTodoUseCase } from "../02_usecase/Todolist/EditTodoUseCase";
-import { IRetrieveTodolistOverviewUseCase } from "../02_usecase/Todolist/RetrieveTodolistOverviewUseCase";
-import { IRetrieveTodosUseCase } from "../02_usecase/Todolist/RetrieveTodosUseCase";
-import { ApiError, ParamsApiError } from "./type";
+import { IClearTodoUseCase } from "../02_usecase/Todolist/ClearTodoUseCase";
+import { IDeleteTodolistUseCase } from "../02_usecase/Todolist/DeleteTodolistUseCase";
+import { IGetStyleUseCase } from "@/02_usecase/Style/GetStyleUseCase";
+
+
 import { NewTodoSchema } from "./validation/NewTodoSchema";
 import { NewTodolistSchema } from "./validation/NewTodolistSchema";
-import { RetrieveTodosSchema } from "./validation/RetrieveTodosSchema";
+import { GetTodosSchema } from "./validation/GetTodosSchema";
 import { EditTodoSchema } from "./validation/EditTodoSchema";
 import { EditTodolistSchema } from "./validation/EditTodolistSchema";
-import { User_details } from "../01_repository/UserRepository";
-
-
+import { UserType } from "@/01_repository/UserRepository";
+import { GetTodolistOverviewSchema } from "./validation/GetTodolistOverviewSchema";
+import { ClearTodoSchema } from "./validation/ClearTodoSchema";
+import { DeleteTodolistSchema } from "./validation/DeleteTodolistSchema";
 
 
 
 export interface ITodolistController {
-  createTodo: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
-  createTodolist: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
-  retriveTodos: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
-  retriveTodolistOverview: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
-  updateTodo: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
-  updateTodolist: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
-  clearTodo: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
-  deleteTodolist: (req: Request, res: Response) => Promise<Response<any, Record<string, any>>>
+  createTodo:           (req: Request, res: Response) 
+    => Promise<Response<any, Record<string, any>>>
+  createTodolist:       (req: Request, res: Response) 
+    => Promise<Response<any, Record<string, any>>>
+  getTodos:             (req: Request, res: Response) 
+    => Promise<Response<any, Record<string, any>>>
+  getTodolistOverview:  (req: Request, res: Response) 
+    => Promise<Response<any, Record<string, any>>>
+  updateTodo:           (req: Request, res: Response) 
+    => Promise<Response<any, Record<string, any>>>
+  updateTodolist:       (req: Request, res: Response) 
+    => Promise<Response<any, Record<string, any>>>
+  clearTodo:            (req: Request, res: Response) 
+    => Promise<Response<any, Record<string, any>>>
+  deleteTodolist:       (req: Request, res: Response) 
+    => Promise<Response<any, Record<string, any>>>
 }
 
 export class TodolistController implements ITodolistController {
   constructor(
-    private ClearTodoUseCase: IClearTodoUseCase,
-    private CreateTodoUseCase: ICreateTodoUseCase,
-    private CreateTodolistUseCase: ICreateTodolistUseCase,
-    private DeleteTodolistUseCase: IDeleteTodolistUseCase,
-    private EditTodoUseCase: IEditTodoUseCase,
-    private EditTodolistUseCase: IEditTodolistUseCase,
-    private RetrieveTodosUseCase: IRetrieveTodosUseCase,
-    private RetrieveTodolistOverviewUseCase: IRetrieveTodolistOverviewUseCase
+    private readonly CreateTodoUseCase:           ICreateTodoUseCase,
+    private readonly CreateTodolistUseCase:       ICreateTodolistUseCase,
+    private readonly GetTodosUseCase:             IGetTodosUseCase,
+    private readonly GetTodolistOverviewUseCase:  IGetTodolistOverviewUseCase,
+    private readonly EditTodoUseCase:             IEditTodoUseCase,
+    private readonly EditTodolistUseCase:         IEditTodolistUseCase,
+    private readonly ClearTodoUseCase:            IClearTodoUseCase,
+    private readonly DeleteTodolistUseCase:       IDeleteTodolistUseCase,
+    private readonly GetStyleUseCase:             IGetStyleUseCase,
   ) {}
 
-  createTodo = async (req: Request, res: Response) => {
+  createTodo = async (
+    req: Request,
+    res: Response
+  ) :Promise<Response<any, Record<string, any>>> => {
     // parameter check
     const result = NewTodoSchema.safeParse(req.body.todo)
     if (!result.success) {
       const response :ParamsApiError = {
-        title: "PARAMETER_ERROR",
+        title:    "PARAMETER_ERROR",
         category: "BAD_REQUEST",
-        status: 400
+        status:   400
       }
       return res.status(400).json(response)
     }
 
-    // const user = req.body.user as User_details
-    // TODO: userが正しいユーザーか確認するようにしたい
+    // userはmidlewareのverifyTokenでreq.body.userに入っているはず．
+    const user_data = req.body.user as UserType
 
-    // create new todo
-    const newTodo_or_error = await this.CreateTodoUseCase.execute(result.data)
-    if ( newTodo_or_error.isFailure() ) {
-      switch ( newTodo_or_error.error.category ) {
+    // style → style_id
+    const style_data = await this.GetStyleUseCase.execute(result.data.style)
+    if ( style_data.isFailure() ) {
+      switch ( style_data.error.category ) {
         case "RECORD_NOT_FOUND":
           return res.status(400).json({
-            title: "PARAMETER_ERROR",
+            title:    "PARAMETER_ERROR",
             category: "BAD_REQUEST",
-            message: "Style or Todolist not found",
-            status: 400
+            message:  "Style or Todolist not found",
+            status:   400
           })
         default: 
           const response :ApiError = {
-            title: "FAILED_TO_CREATE_USER",
+            title:    "FAILED_TO_CREATE_USER",
             category: "SYSTEM_ERROR",
-            status: 500
+            status:   500
+          }
+          return res.status(500).json(response) 
+      }
+    }
+
+    // create new todo
+    const newTodo_or_error = await this.CreateTodoUseCase.execute({
+      todolist_id:    result.data.todolist_id,
+      user_id:        user_data.user_id,
+      todo_title:     result.data.todo_title,
+      style_id:       style_data.value.style_id,
+    })
+    if ( newTodo_or_error.isFailure() ) {
+      switch ( newTodo_or_error.error.category ) {
+        default: 
+          const response :ApiError = {
+            title:    "FAILED_TO_CREATE_USER",
+            category: "SYSTEM_ERROR",
+            status:   500
           }
           return res.status(500).json(response) 
       }
     }
 
     // res
-    const newTodo = newTodo_or_error.value
     return res.status(201).json({
-      title: "SUCCESS",
-      todo: newTodo
+      title:  "SUCCESS",
+      todo:   newTodo_or_error.value
     })
   }
 
-  createTodolist = async (req: Request, res: Response) => {
+  createTodolist = async (
+    req: Request, 
+    res: Response
+  ) => {
     //parameter check
     const result = NewTodolistSchema.safeParse(req.body.todolist)
     if ( !result.success ) {
       const response :ParamsApiError = {
-        title: "PARAMETER_ERROR",
+        title:    "PARAMETER_ERROR",
         category: "BAD_REQUEST",
-        status: 400
+        status:   400
       }
       return res.status(400).json(response)
     }
 
-    // create new todolist
-    const newTodolist_or_error = await this.CreateTodolistUseCase.execute(result.data)
-    if ( newTodolist_or_error.isFailure() ) {
-      switch ( newTodolist_or_error.error.category ) {
+    // userはmidlewareのverifyTokenでreq.body.userに入っているはず．
+    const user_data = req.body.user as UserType
+
+    // style → style_id
+    const style_data = await this.GetStyleUseCase.execute(result.data.style)
+    if ( style_data.isFailure() ) {
+      switch ( style_data.error.category ) {
         case "RECORD_NOT_FOUND":
           return res.status(400).json({
-            title: "PARAMETER_ERROR",
+            title:    "PARAMETER_ERROR",
             category: "BAD_REQUEST",
-            message: "Style not found",
-            status: 400
-          })
+            message:  "Style or Todolist not found",
+            status:   400
+          })  
         default: 
           const response :ApiError = {
-            title: "FAILED_TO_CREATE_USER",
+            title:    "FAILED_TO_CREATE_USER",
             category: "SYSTEM_ERROR",
-            status: 500
+            status:   500
+          }
+          return res.status(500).json(response) 
+      }
+    }
+
+    // create new todolist
+    const newTodolist_or_error = await this.CreateTodolistUseCase.execute({
+      user_id:        user_data.user_id,
+      todolist_title: result.data.todolist_title,
+      style_id:       style_data.value.style_id,
+    })
+    if ( newTodolist_or_error.isFailure() ) {
+      switch ( newTodolist_or_error.error.category ) {
+        default: 
+          const response :ApiError = {
+            title:    "FAILED_TO_CREATE_USER",
+            category: "SYSTEM_ERROR",
+            status:   500
           }
           return res.status(500).json(response) 
       }
     }
 
     // res
-    const newTodolist = newTodolist_or_error.value
     return res.status(201).json({
-      title: "SUCCESS",
-      todo: newTodolist
+      title:  "SUCCESS",
+      todo:   newTodolist_or_error.value,
     })
   }
 
-  retriveTodos = async (req: Request, res: Response) :Promise<Response<any, Record<string, any>>> => {
+  getTodos = async (
+    req: Request,
+    res: Response
+  ) => {
     // parameter check
-    const result = RetrieveTodosSchema.safeParse(req.body.todolist)
+    const result = GetTodosSchema.safeParse(req.body.todolist)
     if ( !result.success ) {
       const response :ParamsApiError = {
-        title: "PARAMETER_ERROR",
+        title:    "PARAMETER_ERROR",
         category: "BAD_REQUEST",
-        status: 400
+        status:   400
       }
       return res.status(400).json(response)
     }
 
     // get
-    const resTodos_or_error = await this.RetrieveTodosUseCase.execute(result.data.todolist_id, result.data.skip, result.data.take)
+    const resTodos_or_error = await this.GetTodosUseCase.execute(
+      result.data.todolist_id,
+      result.data.skip,
+      result.data.take
+    )
     if ( resTodos_or_error.isFailure() ) {
       switch ( resTodos_or_error.error.category ) {
         case "RECORD_NOT_FOUND":
           return res.status(400).json({
-            title: "PARAMETER_ERROR",
+            title:    "RECORD_NOT_FOUND",
             category: "BAD_REQUEST",
-            message: "Style not found",
-            status: 400
+            message:  "todo not found",
+            status:   400
           })
         default: 
           const response :ApiError = {
-            title: "FAILED_TO_CREATE_USER",
+            title:    "FAILED_TO_CREATE_USER",
             category: "SYSTEM_ERROR",
-            status: 500
+            status:   500
           }
           return res.status(500).json(response) 
       }
@@ -166,24 +231,43 @@ export class TodolistController implements ITodolistController {
     })
   }
 
-  retriveTodolistOverview = async (req: Request, res: Response) :Promise<Response<any, Record<string, any>>> => {
-    const name = req.body.user.name as string
+  getTodolistOverview = async (
+    req: Request,
+    res: Response
+  ) :Promise<Response<any, Record<string, any>>> => {
+    // param check
+    const result = GetTodolistOverviewSchema.safeParse(req.body.todolist)
+    if ( !result.success ) {
+      const response :ParamsApiError = {
+        title:    "PARAMETER_ERROR",
+        category: "BAD_REQUEST",
+        status:   400
+      }
+      return res.status(400).json(response)
+    }
 
-    const todolistOverview = await this.RetrieveTodolistOverviewUseCase.execute(name)
+    // verifyTokenでreq.body.user as UserTypeなはず
+    const user_data = req.body.user as UserType
+
+    const todolistOverview = await this.GetTodolistOverviewUseCase.execute(
+      user_data.user_id,
+      result.data.skip,
+      result.data.take,
+    )
     if ( todolistOverview.isFailure() ) {
       switch ( todolistOverview.error.category ) {
         case "RECORD_NOT_FOUND":
           return res.status(400).json({
-            title: "PARAMETER_ERROR",
+            title:    "PARAMETER_ERROR",
             category: "BAD_REQUEST",
-            message: "Style not found",
-            status: 400
+            message:  "Style not found",
+            status:   400
           })
         default: 
           const response :ApiError = {
-            title: "FAILED_TO_CREATE_USER",
+            title:    "FAILED_TO_CREATE_USER",
             category: "SYSTEM_ERROR",
-            status: 500
+            status:   500
           }
           return res.status(500).json(response) 
       }
@@ -195,19 +279,50 @@ export class TodolistController implements ITodolistController {
     })
   }
 
-  updateTodo = async (req: Request, res: Response) :Promise<Response<any, Record<string, any>>> => {
+  updateTodo = async (
+    req: Request,
+    res: Response
+  ) :Promise<Response<any, Record<string, any>>> => {
     //param check
     const result = EditTodoSchema.safeParse(req.body.todo)
     if ( !result.success ) {
       const response :ParamsApiError = {
-        title: "PARAMETER_ERROR",
+        title:    "PARAMETER_ERROR",
         category: "BAD_REQUEST",
-        status: 400
+        status:   400
       }
       return res.status(400).json(response)
     }
 
-    const newTodo_or_error = await this.EditTodoUseCase.execute({ ...result.data, updatedAt: new Date() })
+    // userはmidlewareのverifyTokenでreq.body.userに入っているはず．
+    const user_data = req.body.user as UserType
+
+    // style → style_id
+    const style_data = await this.GetStyleUseCase.execute(result.data.style)
+    if ( style_data.isFailure() ) {
+      switch ( style_data.error.category ) {
+        case "RECORD_NOT_FOUND":
+          return res.status(400).json({
+            title:    "PARAMETER_ERROR",
+            category: "BAD_REQUEST",
+            message:  "Style or Todolist not found",
+            status:   400
+          })
+        default: 
+          const response :ApiError = {
+            title:    "FAILED_TO_CREATE_USER",
+            category: "SYSTEM_ERROR",
+            status:   500
+          }
+          return res.status(500).json(response) 
+      }
+    }
+
+    const newTodo_or_error = await this.EditTodoUseCase.execute({
+      ...result.data, 
+      user_id:  user_data.user_id,
+      style_id: style_data.value.style_id,
+    })
     if ( newTodo_or_error.isFailure() ) {
       switch ( newTodo_or_error.error.category ) {
         default: 
@@ -226,19 +341,153 @@ export class TodolistController implements ITodolistController {
     })
   }
 
-  updateTodolist = async (req: Request, res: Response) :Promise<Response<any, Record<string, any>>> => {
+  updateTodolist = async (
+    req: Request,
+    res: Response
+  ) :Promise<Response<any, Record<string, any>>> => {
     // param check
     const result = EditTodolistSchema.safeParse(req.body.todo)
     if ( !result.success ) {
       const response :ParamsApiError = {
-        title: "PARAMETER_ERROR",
+        title:    "PARAMETER_ERROR",
         category: "BAD_REQUEST",
-        status: 400
+        status:   400
       }
       return res.status(400).json(response)
     }
 
-    const user = req.body.user as User_details
+    // userはmidlewareのverifyTokenでreq.body.userに入っているはず．
+    const user_data = req.body.user as UserType
+
+    // style → style_id
+    const style_data = await this.GetStyleUseCase.execute(result.data.style)
+    if ( style_data.isFailure() ) {
+      switch ( style_data.error.category ) {
+        case "RECORD_NOT_FOUND":
+          return res.status(400).json({
+            title:    "PARAMETER_ERROR",
+            category: "BAD_REQUEST",
+            message:  "Style or Todolist not found",
+            status:   400
+          })
+        default: 
+          const response :ApiError = {
+            title:    "FAILED_TO_CREATE_USER",
+            category: "SYSTEM_ERROR",
+            status:   500
+          }
+          return res.status(500).json(response) 
+      }
+    }
+
+    const todolist_or_error = await this.EditTodolistUseCase.execute({
+      ...result.data, 
+      user_id:  user_data.user_id,
+      style_id: style_data.value.style_id,
+    })
+    if ( todolist_or_error.isFailure() ) {
+      switch ( todolist_or_error.error.category ) {
+        default: 
+          const response :ApiError = {
+            title:    "FAILED_TO_CREATE_USER",
+            category: "SYSTEM_ERROR",
+            status:   500
+          }
+          return res.status(500).json(response) 
+      }
+    }
+
+    return res.status(201).json({
+      title:  "SUCCESS",
+      todo:   todolist_or_error.value
+    })
   }
-  
+
+  clearTodo = async (
+    req: Request,
+    res: Response
+  ) => {
+    // parameter check
+    const result = ClearTodoSchema.safeParse(req.body.todolist)
+    if ( !result.success ) {
+      const response :ParamsApiError = {
+        title:    "PARAMETER_ERROR",
+        category: "BAD_REQUEST",
+        status:   400
+      }
+      return res.status(400).json(response)
+    }
+
+    // clear
+    const resTodo_or_error = await this.ClearTodoUseCase.execute(
+      result.data.todo_id,
+    )
+    if ( resTodo_or_error.isFailure() ) {
+      switch ( resTodo_or_error.error.category ) {
+        case "RECORD_NOT_FOUND":
+          return res.status(400).json({
+            title:    "RECORD_NOT_FOUND",
+            category: "BAD_REQUEST",
+            message:  "todo not found",
+            status:   400
+          })
+        default: 
+          const response :ApiError = {
+            title:    "FAILED_TO_CREATE_USER",
+            category: "SYSTEM_ERROR",
+            status:   500
+          }
+          return res.status(500).json(response) 
+      }
+    }
+
+    return res.status(201).json({
+      title: "SUCCESS",
+      todos: resTodo_or_error.value
+    })
+  }
+
+  deleteTodolist = async (
+    req: Request,
+    res: Response
+  ) => {
+    // parameter check
+    const result = DeleteTodolistSchema.safeParse(req.body.todolist)
+    if ( !result.success ) {
+      const response :ParamsApiError = {
+        title:    "PARAMETER_ERROR",
+        category: "BAD_REQUEST",
+        status:   400
+      }
+      return res.status(400).json(response)
+    }
+
+    // clear
+    const todolist_or_error = await this.DeleteTodolistUseCase.execute(
+      result.data.todolist_id,
+    )
+    if ( todolist_or_error.isFailure() ) {
+      switch ( todolist_or_error.error.category ) {
+        case "RECORD_NOT_FOUND":
+          return res.status(400).json({
+            title:    "RECORD_NOT_FOUND",
+            category: "BAD_REQUEST",
+            message:  "todo not found",
+            status:   400
+          })
+        default: 
+          const response :ApiError = {
+            title:    "FAILED_TO_CREATE_USER",
+            category: "SYSTEM_ERROR",
+            status:   500
+          }
+          return res.status(500).json(response) 
+      }
+    }
+
+    return res.status(201).json({
+      title: "SUCCESS",
+      todos: todolist_or_error.value
+    })
+  }
 }

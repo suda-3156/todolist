@@ -11,7 +11,7 @@ type TokenPayload = {
 
 export class TokenError extends Error {}
 
-const decodeJWT = (req :Request) :Result<TokenPayload, TokenError>=> {
+export const decodeJWT = (req :Request) :Result<TokenPayload, TokenError>=> {
   const bearerHeader = req.headers["authorization"]
   if ( bearerHeader ) {
     const bearer = bearerHeader.split(" ")[1]

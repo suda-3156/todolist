@@ -2,7 +2,7 @@ import { z } from "zod";
 
 
 
-export const RetrieveTodosSchema = z.object({
+export const GetTodosSchema = z.object({
   todolist_id: z
     .string()
     .trim()

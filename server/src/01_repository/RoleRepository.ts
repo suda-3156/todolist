@@ -12,7 +12,7 @@ import { RepositoryError } from "./RepositoryError"
 import { Failure, Result, Success } from "@/type"
 
 
-type RoleType = {
+export type RoleType = {
   role_id:    number,
   role:       string,
   updatedAt:  Date,

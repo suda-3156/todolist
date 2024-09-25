@@ -1,11 +1,11 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "./src/04_app/index.ts",
+  "main": "index.ts",
   "type": "commonjs",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon --exec node -r ts-node/register --env-file=.env ./src/04_app/index.ts"
+    "dev": "nodemon --exec node -r tsconfig-paths/register -r ts-node/register --env-file=.env ./src/04_app/index.ts"
   },
   "author": "suda",
   "license": "MIT",
@@ -18,6 +18,7 @@
     "jsonwebtoken": "^9.0.2",
     "mysql2": "^3.11.0",
     "reflect-metadata": "^0.2.2",
+    "tsconfig-paths": "^4.2.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

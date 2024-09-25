@@ -12,7 +12,7 @@ import { RepositoryError } from "./RepositoryError"
 import { Failure, Result, Success } from "../type"
 
 
-type StyleType = {
+export type StyleType = {
   style_id:   number,
   style:      string,
   updatedAt:  Date,

@@ -4,7 +4,7 @@
 import express, { Application } from 'express'
 import cors from "cors"
 import { PrismaClient } from "@prisma/client"
-import { authRouter } from '@/04_app/routes'
+import { authRouter, todolistRouter } from '@/04_app/routes'
 
 const app :Application = express()
 const PORT = 8080
@@ -20,6 +20,7 @@ app.use(cors(options))
 app.use(express.json())
 
 app.use("/api/v1", authRouter)
+app.use("/api/v1", todolistRouter)
 
 app.listen(PORT, () => {
   console.log("Server is running on port: ", PORT)

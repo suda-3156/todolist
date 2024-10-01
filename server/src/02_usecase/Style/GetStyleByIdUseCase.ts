@@ -5,7 +5,7 @@ import { IStyleRepository, StyleType } from "@/01_repository/StyleRepository"
 
 
 export interface IGetStyleByIdUseCase {
-  execute: (style_id: string) 
+  execute: (style_id: number) 
     => Promise<Result<StyleType, UseCaseError>>
 }
 
@@ -15,9 +15,9 @@ export class GetStyleByIdUseCase implements IGetStyleByIdUseCase {
   ){}
 
   execute = async (
-    style_id:  string,
+    style_id:  number,
   ) :Promise<Result<StyleType, UseCaseError>> => {
-    const styleRes = await this.SR.findByStyle(style_id)
+    const styleRes = await this.SR.findById(style_id)
     
     if ( styleRes.isFailure() ) {
       switch ( styleRes.error.category ) {

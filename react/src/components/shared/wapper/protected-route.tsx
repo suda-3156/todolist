@@ -3,8 +3,8 @@
  * 認証済みの場合のみ閲覧できるページにかぶせる
  */
 import { VerifyTokenAPI } from "@/api/verifyTokenApi"
-import { useUserStore } from "@/store/userStore"
-import { useAlertModalStore } from "@/store/alertModalStore"
+import { useUserStore } from "@/components/shared/store/userStore"
+import { useAlertModalStore } from "@/components/features/alert-modal/alertModalStore"
 import { FC, useEffect, useState } from "react"
 import { Navigate, Outlet } from "react-router-dom"
 import { Loading } from "../modules/loading"

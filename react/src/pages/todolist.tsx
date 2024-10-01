@@ -1,4 +1,4 @@
-import { AnimatedDiv } from "@/components/wapper/animated-div"
+import { AnimatedDiv } from "@/components/shared/wapper/animated-div"
 
 
 export const Todolist = () => {

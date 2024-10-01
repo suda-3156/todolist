@@ -4,7 +4,7 @@
 */
 // TODO: cancelボタンを押したときの振る舞いについて、考える
 
-import { useAlertModalStore } from "../../store/alertModalStore"
+import { useAlertModalStore } from "./alertModalStore"
 import { useNavigate } from "react-router-dom"
 
 import {
@@ -19,7 +19,7 @@ import {
   AlertDialogOverlay,
   AlertDialogPortal
 } from "@/components/ui/alert-dialog"
-import { AnimatedDiv } from "../wapper/animated-div"
+import { AnimatedDiv } from "@/components/shared/wapper/animated-div"
 
 
  

@@ -1,13 +1,13 @@
 /**
  * Sign Up Page
  */
-import { useAlertModalStore } from "@/store/alertModalStore"
-import { useUserStore } from "@/store/userStore"
+import { useAlertModalStore } from "@/components/features/alert-modal/alertModalStore"
+import { useUserStore } from "@/components/shared/store/userStore"
 import { Link, useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, FormProvider } from "react-hook-form"
 
-import { AnimatedDiv } from "@/components/wapper/animated-div"
+import { AnimatedDiv } from "@/components/shared/wapper/animated-div"
 import {
   Card,
   CardContent,

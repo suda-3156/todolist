@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils"
+import { cn } from "@/components/shared/lib/utils"
 import { motion } from "framer-motion"
 import { ReactNode } from "react"
 import { Link } from "react-router-dom"

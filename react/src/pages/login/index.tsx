@@ -1,8 +1,8 @@
 /**
  * Login Page
  */
-import { useAlertModalStore } from "@/store/alertModalStore"
-import { useUserStore } from "@/store/userStore"
+import { useAlertModalStore } from "@/components/features/alert-modal/alertModalStore"
+import { useUserStore } from "@/components/shared/store/userStore"
 import { Link, useNavigate } from "react-router-dom"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm, FormProvider } from "react-hook-form"
@@ -14,7 +14,7 @@ import {
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { AnimatedDiv } from "@/components/wapper/animated-div"
+import { AnimatedDiv } from "@/components/shared/wapper/animated-div"
 
 import { LoginAPI } from "@/api/loginApi"
 import { LoginFormInputSchema, LoginFormSchema } from "./schema"

@@ -1,4 +1,4 @@
-import { useSidebarState } from "@/store/sidebarStore"
+import { useSidebarState } from "@/components/features/sidebar/sidebarStore"
 
 export const Top = () => {
   const toggleSidebar = useSidebarState((state) => state.toggleSidebar)

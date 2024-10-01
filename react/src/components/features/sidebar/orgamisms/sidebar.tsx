@@ -2,8 +2,8 @@
 import { motion } from "framer-motion"
 import { CircleUserRound, LogOut, SquarePen, ListTodo } from "lucide-react"
 
-import { useSidebarState } from "@/store/sidebarStore"
-import { useUserStore } from "@/store/userStore"
+import { useSidebarState } from "../sidebarStore"
+import { useUserStore } from "@/components/shared/store/userStore"
 
 import { SidebarContents, SidebarUtils } from "../wapper/sidebar"
 import { SidebarOpener } from "../molcules/sidebar-opener"
@@ -36,6 +36,10 @@ export const Sidebar = () => {
         <SidebarItem isOpen={isOpen} num={1} link="/private/todolist" >
           <ListTodo />
           Todo list
+        </SidebarItem>
+        <SidebarItem isOpen={isOpen} num={1} link="/private/testpage" >
+          <ListTodo />
+          Test page
         </SidebarItem>
         <SidebarUtils isOpen={isOpen} className="mt-auto">
           <footer className="w-full h-10 flex items-center justify-end text-primary">

@@ -6,7 +6,7 @@
 import { Outlet } from "react-router-dom"
 
 import { AnimatedDiv } from "../wapper/animated-div"
-import { Sidebar } from "../orgamisms/sidebar"
+import { Sidebar } from "../../features/sidebar/orgamisms/sidebar"
 
 export const GlobalLayout = () => {
   return (

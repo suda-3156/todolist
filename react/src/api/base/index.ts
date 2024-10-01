@@ -1,4 +1,4 @@
-import { getTokenFromStorage } from "@/lib/token"
+import { getTokenFromStorage } from "@/components/shared/lib/token"
 import axios from "axios"
 import { ApiError, ValidationApiError } from "./type"
 

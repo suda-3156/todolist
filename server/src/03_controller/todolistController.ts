@@ -21,6 +21,7 @@ import { UserType } from "@/01_repository/UserRepository";
 import { GetTodolistOverviewSchema } from "./validation/GetTodolistOverviewSchema";
 import { ClearTodoSchema } from "./validation/ClearTodoSchema";
 import { DeleteTodolistSchema } from "./validation/DeleteTodolistSchema";
+import { IGetStyleByIdUseCase } from "@/02_usecase/Style/GetStyleByIdUseCase";
 
 
 
@@ -54,6 +55,7 @@ export class TodolistController implements ITodolistController {
     private readonly ClearTodoUseCase:            IClearTodoUseCase,
     private readonly DeleteTodolistUseCase:       IDeleteTodolistUseCase,
     private readonly GetStyleUseCase:             IGetStyleUseCase,
+    // private readonly GetStyleByIdUseCase:         IGetStyleByIdUseCase,
   ) {}
 
   createTodo = async (
@@ -117,7 +119,10 @@ export class TodolistController implements ITodolistController {
     // res
     return res.status(201).json({
       title:  "SUCCESS",
-      todo:   newTodo_or_error.value
+      todo:   {
+        ...newTodo_or_error.value,
+        style: style_data.value.style
+      }
     })
   }
 
@@ -181,7 +186,10 @@ export class TodolistController implements ITodolistController {
     // res
     return res.status(201).json({
       title:  "SUCCESS",
-      todo:   newTodolist_or_error.value,
+      todo:   {
+        ...newTodolist_or_error.value,
+        style: style_data.value.style
+      }
     })
   }
 
@@ -190,7 +198,7 @@ export class TodolistController implements ITodolistController {
     res: Response
   ) => {
     // parameter check
-    const result = GetTodosSchema.safeParse(req.body.todolist)
+    const result = GetTodosSchema.safeParse(req.body.todo)
     if ( !result.success ) {
       const response :ParamsApiError = {
         title:    "PARAMETER_ERROR",
@@ -225,13 +233,26 @@ export class TodolistController implements ITodolistController {
       }
     }
 
+    // const style_data = await Promise.all(
+    //   resTodos_or_error.value.map( async (todo) => {
+    //     const each_style_data = await this.GetStyleByIdUseCase.execute(todo.style_id)
+    //     return {
+    //       ...todo,
+    //       each_style_data: each_style_data,
+    //     }
+    //   })
+    // )
+
     return res.status(201).json({
       title: "SUCCESS",
-      todos: resTodos_or_error.value
+      todos: {
+        ...resTodos_or_error.value,
+        // style
+        // XXX: DARURURURURUR
+      }
     })
   }
-
-  getTodolistOverview = async (
+getTodolistOverview = async (
     req: Request,
     res: Response
   ) :Promise<Response<any, Record<string, any>>> => {
@@ -346,7 +367,7 @@ export class TodolistController implements ITodolistController {
     res: Response
   ) :Promise<Response<any, Record<string, any>>> => {
     // param check
-    const result = EditTodolistSchema.safeParse(req.body.todo)
+    const result = EditTodolistSchema.safeParse(req.body.todolist)
     if ( !result.success ) {
       const response :ParamsApiError = {
         title:    "PARAMETER_ERROR",
@@ -408,7 +429,7 @@ export class TodolistController implements ITodolistController {
     res: Response
   ) => {
     // parameter check
-    const result = ClearTodoSchema.safeParse(req.body.todolist)
+    const result = ClearTodoSchema.safeParse(req.body.todo)
     if ( !result.success ) {
       const response :ParamsApiError = {
         title:    "PARAMETER_ERROR",
